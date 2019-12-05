@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public class Blobservation{
     int width;
     int height;
-    List<Blob>[][] blobsOnBoard;    //array of list of blobs
+   public List<Blob>[][] blobsOnBoard;    //array of list of blobs
     final int BLOB_MAX_SIZE = 20;
 
     public Blobservation(int height   , int width){
@@ -38,14 +38,14 @@ public class Blobservation{
     public void populate(List<Map<String,Integer>> generation){
         //populate board
         if(!validateBlobList(generation)){ throw new IllegalArgumentException();}
-        generation.stream()
-                .map(a -> blobsOnBoard[a.get("x")][a.get("y")].add(new Blob(a.get("x"),a.get("y"), a.get("size"))));
-//        for(Map<String, Integer> blob:generation){
-//            int x = blob.get("x");
-//            int y = blob.get("y");
-//            int size = blob.get("size");
-//            blobsOnBoard[x][y].add(new Blob(x,y,size)); //add blob to list
-//        }
+//        generation.stream()
+//                .map(a -> blobsOnBoard[a.get("x")][a.get("y")].add(new Blob(a.get("x"),a.get("y"), a.get("size"))));
+        for(Map<String, Integer> blob:generation){
+            int x = blob.get("x");
+            int y = blob.get("y");
+            int size = blob.get("size");
+            blobsOnBoard[x][y].add(new Blob(x,y,size)); //add blob to list
+        }
     }
 
     //test method for adding blobs withoud needing to create a generation list
@@ -120,10 +120,22 @@ public class Blobservation{
             return;
         }
         //else find clockwise closest blob
+        blob.setNextMove(getClockwiseClosestBlob(blob,largestBlobs));
+    }
 
+    public Blob getClockwiseClosestBlob(Blob source,List<Blob> largestBlobs) {
+        Map<Double, Blob> blobAngles = new HashMap<>();
+        for(Blob target:largestBlobs){
+            double angle = getAngleBetweenBlobs(source,target);
+            blobAngles.put(angle,target);
+        }
+        double minAngle = blobAngles.keySet().stream().min(Double::compareTo).get();
+        return blobAngles.get(minAngle);
+    }
 
-
-
+    public double getAngleBetweenBlobs(Blob source, Blob target){
+        double rawAngle = Math.atan2(target.y - source.y,target.x - source.x);
+        return (3*Math.PI - rawAngle)%(2*Math.PI);
     }
 
     public static List<Blob> getLargestBlobs(List<Blob> blobs){

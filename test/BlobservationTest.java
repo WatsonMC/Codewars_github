@@ -8,6 +8,7 @@ import java.util.*;
 
 public class BlobservationTest {
     static  Blobservation b3x3;
+    static  Blobservation b7x7;
     static  Blobservation.Blob b11;
     static Blobservation.Blob b22;
     static Blobservation.Blob b20;
@@ -28,7 +29,7 @@ public class BlobservationTest {
         b3x3.addBlob(b11);
         b3x3.addBlob(b22);
         b3x3.addBlob(b20);
-        Blobservation b7x7 = new Blobservation(7, 7);
+        b7x7 = new Blobservation(7, 7);
         generation1 = new ArrayList<>();
         generation1.add(createBlobMap(1,2,2));
         generation1.add(createBlobMap(1,1,5));
@@ -42,6 +43,39 @@ public class BlobservationTest {
         b1map.put("y", y);
         b1map.put("size", size);
         return b1map;
+    }
+
+    @Test
+    public void testGetClockwiseClosest(){
+        List<Blobservation.Blob> blobs = new ArrayList<>();
+        blobs.add(b11);
+        blobs.add(b22);
+        blobs.add(b20);
+        blobs.add(b00);
+
+        Blobservation.Blob s10 = b3x3.makeBlob(1,0,1);
+
+        Assert.assertEquals(b00,b3x3.getClockwiseClosestBlob(s10,blobs));
+        blobs.remove(b00);
+        Assert.assertEquals(b11,b3x3.getClockwiseClosestBlob(s10,blobs));
+        blobs.remove(b11);
+        Assert.assertEquals(b22,b3x3.getClockwiseClosestBlob(b11,blobs));
+    }
+
+    @Test
+    public void testPopulate(){
+        //gen 1
+        b7x7.populate(generation1);
+        Assert.assertTrue(
+                b7x7.blobsOnBoard[1][2].size()==1&&
+                        b7x7.makeBlob(1,2,2).equals(b7x7.blobsOnBoard[1][2].get(0)));
+        Assert.assertTrue(
+                b7x7.blobsOnBoard[1][1].size()==1&&
+                        b7x7.blobsOnBoard[1][1].get(0).equals(b7x7.makeBlob(1,1,5)));
+        Assert.assertTrue(
+                b7x7.blobsOnBoard[0][1].size()==1&&
+                        b7x7.makeBlob(0,1,3).equals(b7x7.blobsOnBoard[0][1].get(0)));
+
     }
 
     @Test
