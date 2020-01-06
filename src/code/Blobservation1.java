@@ -4,14 +4,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-public class Blobservation{
+public class Blobservation1 {
     int width;
     int height;
     public List<Blob>[][] blobsOnBoard;    //array of list of blobs
     final int BLOB_MAX_SIZE = 20;
 
-    public Blobservation(int height, int width){
-        //TODO Throw exception
+    public Blobservation1(int height, int width){
         this.width = width;
         this.height = height;
         this.blobsOnBoard = new ArrayList[height][width];
@@ -22,24 +21,12 @@ public class Blobservation{
         }
     }
 
-    public Blobservation(int width){
-        //TODO Throw exception
-       this(width,width);
+    public Blobservation1(int width){
+        this(width,width);
     }
 
-    /**
-     * Populate
-     * 1. validate map
-     * 2. For each map in list
-     *  a. get x and y
-     *  b. pull blobsOnBoard[x][y]
-     *  c. add blob to list of blobs
-     */
     public void populate(List<Map<String,Integer>> generation){
-        //populate board
         if(!validateBlobList(generation)){ throw new IllegalArgumentException();}
-//        generation.stream()
-//                .map(a -> blobsOnBoard[a.get("x")][a.get("y")].add(new Blob(a.get("x"),a.get("y"), a.get("size"))));
         for(Map<String, Integer> blob:generation){
             int x = blob.get("x");
             int y = blob.get("y");
@@ -49,49 +36,12 @@ public class Blobservation{
         fuseBlobs();
     }
 
-    //test method for adding blobs withoud needing to create a generation list
-    public void addBlob(int x,int y,int size){
-        blobsOnBoard[x][y].add(new Blob(x,y,size));
-    }
-    public void addBlob(Blob blob){
-        blobsOnBoard[blob.x][blob.y].add(blob);
-    }
-    public Blob makeBlob(int x,int y, int size){
-        return new Blob(x,y,size);
-    }
-
-
-    /**
-     * Move int x
-     * 1. while x>0, for each move
-     *  a. get list of blobs indexed by size
-     *  b. find all blobs greater in size than smallest blob
-     *  c. calculate their next movement and store in nextMove field
-     *      - create list of blobs
-     *  d. when complete, process all moves
-     *      a. remoive from current location
-     *      b. add to next location
-     *      c. change x y
-     *      d. reset nextMove
-     *  e. When processing complete fuse all blobs
-     *      a. for each positon on board call fuse
-     *          - sum sizes of blobs in list
-     *          - clear list
-     *          - add new blob
-     */
-
     public void move(int x){
         if(x<=0) {
             throw new RuntimeException();
         }
         for(int i =0; i<x;i++) {
             if(!processMove()){return;}
-            logger(String.valueOf(i));
-            if(i>2000){
-                System.out.println(printBoardString());
-
-            }
-            //System.out.println(printBoardString());
         }
     }
 
@@ -105,8 +55,7 @@ public class Blobservation{
         boolean movesFound = false;
         fuseBlobs();
         Map<Integer, List<Blob>> blobsBySize = getBlobsBySize();
-        if(blobsBySize.size()  == 0){logger("No blobs when processing move");
-            logger(printBoardString());
+        if(blobsBySize.size()  == 0){
             return movesFound;
         }
         int smallestBlob = blobsBySize.keySet().stream().min(Integer::compareTo).get();//remove smallest blobs
@@ -132,8 +81,7 @@ public class Blobservation{
                 .collect(Collectors.toList()), blob);
         //first scan => closest blob
         if(smallestDistanceTargets.size() ==0){
-            logger("Found no targets during first scan");
-             smallestDistanceTargets = getValidTargets(blobsBySize.values().stream().
+            smallestDistanceTargets = getValidTargets(blobsBySize.values().stream().
                     flatMap(List::stream)
                     .collect(Collectors.toList()), blob);
         }
@@ -143,7 +91,6 @@ public class Blobservation{
         }
         //else find largest blobs which are closest => largest blobs of equal distance
         List<Blob> largestBlobs = getLargestBlobs(smallestDistanceTargets);
-        if(largestBlobs.size() ==0){logger("Found no targets during first scan");}
         if (largestBlobs.size()==1){
             blob.setNextMove(largestBlobs.get(0));
             return;
@@ -248,18 +195,13 @@ public class Blobservation{
         return tempMap;
     }
 
-    // print state
-    public static void logger(String message){
-        System.out.println(message);
-    }
-
     //Tested
     public boolean validateBlobList(List<Map<String,Integer>> blobs){
         if(blobs.size() == 0){return false;}
         for(Map<String, Integer> blob: blobs){
             if(blob.get("x")<0||blob.get("x")>=height
-                || blob.get("y")<0 || blob.get("y")>=width
-                || blob.get("size")>20 || blob.get("size")<1) {
+                    || blob.get("y")<0 || blob.get("y")>=width
+                    || blob.get("size")>20 || blob.get("size")<1) {
                 return false;
             }
         }
@@ -284,27 +226,6 @@ public class Blobservation{
         return blobs;
     }
 
-
-   public String printBoardString() {
-        StringBuilder sb = new StringBuilder();
-        for(int i =0;i<height;i++) {
-            for(int j =0; j<width;j++) {
-                if(!blobsOnBoard[i][j].isEmpty()) {
-//                    sb.append(blobsOnBoard[i][j].printState() + ", ");
-                    for(Blob blob: blobsOnBoard[i][j]){
-                        sb.append(blob.print() + ", ");
-                    }
-                }
-            }
-        }
-        if(sb.length()==0){return "";}
-        sb.deleteCharAt(sb.length()-1);
-        sb.deleteCharAt(sb.length()-1);
-        sb.insert(0, "[");
-        sb.insert(sb.length()-1, "]");
-        return sb.toString();
-    }
-
     public class Blob{
         public Integer size;
         Integer x;
@@ -313,10 +234,6 @@ public class Blobservation{
         NextMove nextMove;
 
         public Blob(Map<String, Integer> blobDetails){
-            if(blobDetails.size()>2 | blobDetails.size() <2){
-                Blobservation.logger("Error: failed to create blob due to data");
-                System.exit(1);
-            }
             this.size = blobDetails.get("size");
             this.x = blobDetails.get("x");
             this.y = blobDetails.get("y");
@@ -349,7 +266,6 @@ public class Blobservation{
         }
 
         public void setNextMove(Blob blob) {
-            if(this.x == blob.x && this.y == blob.y) {logger("setNextMove called on blobs on same posn");}
             int xMovement = this.x-blob.x == 0?0:(blob.x - this.x)/Math.abs(this.x-blob.x);
             int yMovement = this.y-blob.y == 0?0:(blob.y - this.y)/Math.abs(this.y-blob.y);
             this.nextMove = new NextMove(this.x+ xMovement, this.y+ yMovement);
@@ -379,20 +295,6 @@ public class Blobservation{
         }
     }
 }
-
-
-
-/**
- * Blob board:
- * _______>y+
- * |
- * |
- * |
- * x+
- */
-
-
-
 
 
 

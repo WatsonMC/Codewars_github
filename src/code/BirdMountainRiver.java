@@ -4,6 +4,7 @@ package code;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -28,10 +29,10 @@ public class BirdMountainRiver {
 
     public static double riverHeight;
 
-    public static int[] availablePositions(char[][] mountain){
+    public static int[] dryGround(char[][] mountain){
         Set<Point> riverSet = new HashSet<>();
         Set<Point> bankSet = new HashSet<>();
-        Set<Point> testSet = new HashSet<>();
+        Queue<Point> testSet = new PriorityQueue<>();
         Set<Integer> availableLandings = new HashSet<>();
         int[][] heightArray;
         int[][] tempHeightArray = new int[mountain.length][mountain[0].length];
@@ -62,16 +63,33 @@ public class BirdMountainRiver {
             riverHeight+=1;
             testSet.addAll(bankSet);
             while(!testSet.isEmpty()){
-                Point nextRiverPosition = testSet.iterator().next();
+                Point nextRiverPosition = testSet.remove();
+                //3. for each point in the test set
+                //     *      a. find all neighbours (as points) and check if height is lower than water level
+                //     *      b. if height lower, add point to the river, bank and test sets
+                //     *      c. if height higher, add this point to the bank set, and continue. at end, any positions not banked should be rmeoved
 
+                boolean stillBank = false;
+                for(Point neighbour: getNeighboursPoints(nextRiverPosition.x,nextRiverPosition.y,heightArray)){
+                    if(heightArray[neighbour.x][neighbour.y] <riverHeight){
+                        heightArray[neighbour.x][neighbour.y] = 0;  //now part of river
+                        riverSet.add(neighbour);
+                        bankSet.add(neighbour);
+                        testSet.add(neighbour);
+                    }
+                    else if(!riverSet.contains(neighbour)){
+                        stillBank = true;  //there exists an adjoining neighbour higher than current river == a bank
+                    }
+                }
+                if(!stillBank){
+                    bankSet.remove(nextRiverPosition);
+                }
             }
-
+            availableLandings.add(getAvailablePositions(heightArray));
         }
-
-
-
-
-        return new int[]{0};
+        return availableLandings.stream()
+                .mapToInt(Integer::intValue)
+                .toArray();
     }
 
     /**
@@ -122,7 +140,7 @@ public class BirdMountainRiver {
                 result.add(new Point(x+a,y));
             }
             if(y+a>=0 && y+a <m){
-                result.add(new Point(x,y+a);
+                result.add(new Point(x,y+a));
             }
         }
         return result;
