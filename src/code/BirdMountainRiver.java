@@ -1,14 +1,15 @@
 package code;
 
 
+
 import java.awt.*;
-import java.util.*;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+import java.util.Queue;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class BirdMountainRiver {
+    public static boolean debug = false;
     /**
      * 1. Create height array and generate initial condition
      *      a. height array of positions
@@ -30,62 +31,72 @@ public class BirdMountainRiver {
     public static double riverHeight;
 
     public static int[] dryGround(char[][] mountain){
-        Set<Point> riverSet = new HashSet<>();
+        if(mountain.length == 0||mountain[0].length == 0){
+            return new int[]{0,0,0,0};
+        }
+        char[][] mountainCopy = deepCopyMountain(mountain);
         Set<Point> bankSet = new HashSet<>();
-        Queue<Point> testSet = new PriorityQueue<>();
-        Set<Integer> availableLandings = new HashSet<>();
-        int[][] heightArray;
-        int[][] tempHeightArray = new int[mountain.length][mountain[0].length];
-        IntStream.range(0, mountain.length).
+        Queue<Point> testSet = new LinkedList<>();
+        List<Integer> availableLandings = new LinkedList<>();
+        int[][] mountainHeights;
+        int[][] tempHeightArray = new int[mountainCopy.length][mountainCopy[0].length];
+        IntStream.range(0, mountainCopy.length).
                 forEach(x -> {
-                    IntStream.range(0, mountain[x].length)
+                    IntStream.range(0, mountainCopy[x].length)
                             .forEach(y -> {
-                                if (mountain[x][y] == '^') {
+                                if (mountainCopy[x][y] == '^') {
                                     tempHeightArray[x][y] = -1;
-                                } else if (mountain[x][y] == '-') {
-                                    riverSet.add(new Point(x, y));
+                                } else if (mountainCopy[x][y] == '-') {
                                     bankSet.add(new Point(x, y));
                                 } else {
                                     tempHeightArray[x][y] = 0;
                                 }
                             });
                 });
-        heightArray = tempHeightArray;
-        for(int i =0; i<Math.max(mountain.length,mountain[0].length); i++){
-            heightArray = getHeightArray(heightArray);
+        mountainHeights = tempHeightArray;
+        for(int i =0; i<Math.max(mountainCopy.length,mountainCopy[0].length); i++){
+            mountainHeights = getHeightArray(mountainHeights);
         }
         //Now we have the bank set and river set and initial conditions
-        availableLandings.add(getAvailablePositions(heightArray)); //get starting available positions
+        availableLandings.add(getAvailablePositions(mountainCopy)); //get starting available positions
 
         //main loop
         riverHeight = -0.5;
         for(int i = 0 ; i <3;i++){
+            System.out.println("Mountain: " + mountainPrint(mountainCopy));
+            debugPrint(Arrays.deepToString(mountainHeights));
             riverHeight+=1;
             testSet.addAll(bankSet);
+            debugPrint(testSet.toString());
             while(!testSet.isEmpty()){
+                debugPrint(testSet.toString());
                 Point nextRiverPosition = testSet.remove();
+                debugPrint("Next position is:" + nextRiverPosition.toString());
                 //3. for each point in the test set
                 //     *      a. find all neighbours (as points) and check if height is lower than water level
                 //     *      b. if height lower, add point to the river, bank and test sets
                 //     *      c. if height higher, add this point to the bank set, and continue. at end, any positions not banked should be rmeoved
 
                 boolean stillBank = false;
-                for(Point neighbour: getNeighboursPoints(nextRiverPosition.x,nextRiverPosition.y,heightArray)){
-                    if(heightArray[neighbour.x][neighbour.y] <riverHeight){
-                        heightArray[neighbour.x][neighbour.y] = 0;  //now part of river
-                        riverSet.add(neighbour);
-                        bankSet.add(neighbour);
-                        testSet.add(neighbour);
-                    }
-                    else if(!riverSet.contains(neighbour)){
-                        stillBank = true;  //there exists an adjoining neighbour higher than current river == a bank
+                for(Point neighbour: getNeighboursPoints(nextRiverPosition.x,nextRiverPosition.y,mountainHeights)){
+                    if(mountainCopy[neighbour.x][neighbour.y] != '-'){
+                        if(mountainHeights[neighbour.x][neighbour.y] <riverHeight){
+                            mountainHeights[neighbour.x][neighbour.y] = 0;  //now part of river
+                            mountainCopy[neighbour.x][neighbour.y] = '-';  //now part of river
+                            bankSet.add(neighbour);
+                            if(!testSet.contains(neighbour)){testSet.add(neighbour);}
+                        }
+                        else{
+                            stillBank = true;  //there exists an adjoining neighbour higher than current river == a bank
+
+                        }
                     }
                 }
                 if(!stillBank){
                     bankSet.remove(nextRiverPosition);
                 }
             }
-            availableLandings.add(getAvailablePositions(heightArray));
+            availableLandings.add(getAvailablePositions(mountainCopy));
         }
         return availableLandings.stream()
                 .mapToInt(Integer::intValue)
@@ -97,19 +108,18 @@ public class BirdMountainRiver {
      * @param heightArray - Array of integers from 0 to n, where n is the tallest point. Any integer greater than 0 is considerec an available landing posn
      * @return
      */
-    public static int getAvailablePositions(int[][] heightArray){
-        final Integer[] posns = {0};
-        Arrays.stream(heightArray)
-                .forEach(x -> Arrays.stream(x)
-                .forEach(y -> {
-                    if(y >0){
-                        posns[0]++;}
-                }));
-        return posns[0];
+    public static int getAvailablePositions(char[][] mountain){
+        int posns =0;
+        for(char[] row: mountain){
+            for(char posn: row){
+                if(posn != '-'){ posns++;}
+            }
+        }
+        return posns;
     }
 
     public static int peakHeight(char[][] mountain) {
-        int[][] copy = copyMountain(mountain);
+        int[][] copy = convertMountainToHeights(mountain);
         int m = mountain.length;
         int n = mountain[0].length;
         for(int i =0; i<Math.max(n,m); i++){
@@ -166,7 +176,14 @@ public class BirdMountainRiver {
         return result;
     }
 
-    public static int[][] copyMountain(char[][] mountain){
+    public static char[][] deepCopyMountain(char[][] mountain){
+        char[][] mountainCopy = new char[mountain.length][mountain[0].length];
+        IntStream.range(0, mountain.length).
+                forEach(x -> mountainCopy[x] = Arrays.copyOf(mountain[x],mountain[x].length));
+        return mountainCopy;
+    }
+
+    public static int[][] convertMountainToHeights(char[][] mountain){
         int[][] mountainCopy = new int[mountain.length][mountain[0].length];
         IntStream.range(0, mountain.length).
                 forEach(x -> IntStream.range(0,mountain[x].length)
@@ -176,6 +193,21 @@ public class BirdMountainRiver {
                         }));
         return mountainCopy;
     }
+
+    public static void debugPrint(String msg){
+        if(debug){
+            System.out.println(msg);
+        }
+    }
+
+    public static String mountainPrint(char[][] mountain){
+        StringBuilder result = new StringBuilder();
+        for(char[] row:mountain){
+            result.append(Arrays.toString(row) + "\n");
+        }
+        return result.toString();
+    }
+
 }
 
 
