@@ -13,9 +13,10 @@ public class BulbGridTest {
 
     @Test
     public void firsTest() {
-        List<Point> testRes = BulbGrid.switchBulbs(GAME_MAPS[0]);
+        List<Point> testRes = BulbGrid.switchBulbs(GAME_MAPS[6]);
 
     }
+
 
     public static void createFixedBulbs(){
         FIXED_BULBS.add(new BulbGrid.Bulb(0,0));

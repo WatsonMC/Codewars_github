@@ -38,33 +38,34 @@ public class BulbGrid {
             }
         }
 
-        List<Bulb> visited = new ArrayList<>();
-        List<Bulb> unvisited = new ArrayList<>();
-        unvisited.addAll(bulbs);
-        List<Point> path = new ArrayList<>();
-        Bulb currBulb = unvisited.remove(0);
-
-        return recursiveFindPath(path, unvisited,bulbs,currBulb);
-
-        //return null;
-//        return i>=exampleSolutions.length ? null :  Arrays.stream(exampleSolutions[i++])
-//                .map( a -> new Point(a[0],a[1]) )
-//                .collect(Collectors.toList());
-
+        List<Bulb> bulbsOriginal = new ArrayList<>();
+        bulbsOriginal.addAll(bulbs);
+        for(Bulb bulb: bulbsOriginal){
+            List<Bulb> unvisited = new ArrayList<>();
+            unvisited.addAll(bulbs);
+            List<Point> path = new ArrayList<>();
+            unvisited.remove(bulb);
+            path.add(new Point(bulb.x, bulb.y));
+            List<Point> retPath = recursiveFindPath(path, unvisited,bulbs,bulb);
+            if(retPath !=null){return retPath;}
+        }
+        return null;
     }
 
     public List<Point> recursiveFindPath(List<Point> currPath, List<Bulb> unvisited, List<Bulb> bulbs, Bulb currentBulb){
 
         // base case
         if(unvisited.isEmpty()){ return currPath;}
-        List<Bulb> viableBulbs = currentBulb.viableBulbs(unvisited);
+        List<Bulb> viableBulbs = currentBulb.viableBulbs(bulbs,unvisited);
 
-        if( viableBulbs.isEmpty()){return null;}
+        if(viableBulbs.isEmpty()){return null;}
+
+        //recursive case
         else{
             for(Bulb bulb: viableBulbs){
                 List<Point> tempPath = new ArrayList<>();
                 tempPath.addAll(currPath);
-                tempPath.remove(new Point(bulb.x,bulb.y));
+                tempPath.add(new Point(bulb.x,bulb.y));
 
                 List<Bulb> tempUnvis = new ArrayList<>();
                 tempUnvis.addAll(unvisited);
@@ -74,15 +75,8 @@ public class BulbGrid {
                 if(retPath !=null){return retPath;}
             }
         }
-  
-
-
-
         return null;
     }
-
-
-
 
     static class Bulb{
 
@@ -98,7 +92,7 @@ public class BulbGrid {
 
 
 
-        public List<Bulb> viableBulbs(List<Bulb> bulbs){
+        public List<Bulb> viableBulbs(List<Bulb> allBulbs,List<Bulb> unvisitedBulbs){
             List<Bulb> viable = new ArrayList<>();
             /**     x..x..x
              *      x..B..x
@@ -113,32 +107,40 @@ public class BulbGrid {
             Bulb downLeft =     new Bulb(10000,10000);
             Bulb downRight =     new Bulb(10000,10000);
 
-            for(Bulb bulb: bulbs){
+            for(Bulb bulb: allBulbs){
                 if(bulb.x == this.x && bulb.y <this.y){ // left
                     if(Math.abs(this.y - leftBulb.y)> Math.abs(this.y - bulb.y)){
                         viable.remove(leftBulb);
-                        viable.add(bulb);
+                        if(unvisitedBulbs.contains(bulb)){
+                            viable.add(bulb);
+                        }
                         leftBulb = bulb;
                     }
                 }
                 if(bulb.x == this.x && bulb.y > this.y) { // right
                     if (Math.abs(this.y - rightBulb.y) > Math.abs(this.y - bulb.y)) {
                         viable.remove(rightBulb);
-                        viable.add(bulb);
+                        if(unvisitedBulbs.contains(bulb)){
+                            viable.add(bulb);
+                        }
                         rightBulb = bulb;
                     }
                 }
                 if(bulb.y == this.y && bulb.x < this.x) { //above
                     if (Math.abs(this.x - upBulb.x) > Math.abs(this.x - bulb.x)) {
                         viable.remove(upBulb);
-                        viable.add(bulb);
+                        if(unvisitedBulbs.contains(bulb)){
+                            viable.add(bulb);
+                        }
                         upBulb = bulb;
                     }
                 }
                 if(bulb.y == this.y && bulb.x > this.x) { //down
                     if (Math.abs(this.x - downBulb.x) > Math.abs(this.x - bulb.x)) {
                         viable.remove(downBulb);
-                        viable.add(bulb);
+                        if(unvisitedBulbs.contains(bulb)){
+                            viable.add(bulb);
+                        }
                         downBulb = bulb;
                     }
                 }
@@ -146,28 +148,36 @@ public class BulbGrid {
                     if(bulb.x < this.x && bulb.y <this.y){ //up left
                         if (Math.abs(this.x - upLeft.x) > Math.abs(this.x - bulb.x)) {
                             viable.remove(upLeft);
-                            viable.add(bulb);
+                            if(unvisitedBulbs.contains(bulb)){
+                                viable.add(bulb);
+                            }
                             upLeft = bulb;
                         }
                     }
                     if(bulb.x< this.x && bulb.y >this.y){ // up right
                         if (Math.abs(this.x - upRight.x) > Math.abs(this.x - bulb.x)) {
                             viable.remove(upRight);
-                            viable.add(bulb);
+                            if(unvisitedBulbs.contains(bulb)){
+                                viable.add(bulb);
+                            }
                             upRight = bulb;
                         }
                     }
                     if(bulb.x > this.x && bulb.y <this.y){ //bottom left
                         if (Math.abs(this.x - downLeft.x) > Math.abs(this.x - bulb.x)) {
                             viable.remove(downLeft);
-                            viable.add(bulb);
+                            if(unvisitedBulbs.contains(bulb)){
+                                viable.add(bulb);
+                            }
                             downLeft = bulb;
                         }
                     }
                     if(bulb.x> this.x && bulb.y >this.y){ // bottom right
                         if (Math.abs(this.x - downRight.x) > Math.abs(this.x - bulb.x)) {
                             viable.remove(downRight);
-                            viable.add(bulb);
+                            if(unvisitedBulbs.contains(bulb)){
+                                viable.add(bulb);
+                            }
                             downRight  = bulb;
                         }
                     }
