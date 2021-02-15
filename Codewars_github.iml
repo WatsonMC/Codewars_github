@@ -18,9 +18,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-<<<<<<< HEAD
-=======
-    <orderEntry type="module-library" scope="TEST">
+
+   <orderEntry type="module-library" scope="TEST">
       <library name="JUnit5.4">
         <CLASSES>
           <root url="jar://$MAVEN_REPOSITORY$/org/junit/jupiter/junit-jupiter/5.4.2/junit-jupiter-5.4.2.jar!/" />
@@ -36,6 +35,6 @@
         <SOURCES />
       </library>
     </orderEntry>
->>>>>>> e8e515b3337065c2ffe10c09a7596f572bab242e
+
   </component>
 </module>
