@@ -59,8 +59,30 @@ public class BulbGrid {
         if(unvisited.isEmpty()){ return currPath;}
         List<Bulb> viableBulbs = currentBulb.viableBulbs(unvisited);
 
+        if( viableBulbs.isEmpty()){return null;}
+        else{
+            for(Bulb bulb: viableBulbs){
+                List<Point> tempPath = new ArrayList<>();
+                tempPath.addAll(currPath);
+                tempPath.remove(new Point(bulb.x,bulb.y));
+
+                List<Bulb> tempUnvis = new ArrayList<>();
+                tempUnvis.addAll(unvisited);
+                tempUnvis.remove(bulb);
+
+                List<Point> retPath = recursiveFindPath(tempPath,tempUnvis,bulbs,bulb);
+                if(retPath !=null){return retPath;}
+            }
+        }
+  
+
+
+
         return null;
     }
+
+
+
 
     static class Bulb{
 
