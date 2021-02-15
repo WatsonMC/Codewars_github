@@ -1,8 +1,7 @@
 package code;
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.stream.*;
-import java.awt.Point;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BulbGrid {
 
@@ -66,7 +65,7 @@ public class BulbGrid {
 
 
 
-    class Bulb{
+    static class Bulb{
 
         int x;
         int y;
@@ -77,6 +76,8 @@ public class BulbGrid {
             this.y = y;
             this.bulbPoint = new Point(x,y);
         }
+
+
 
         public List<Bulb> viableBulbs(List<Bulb> bulbs){
             List<Bulb> viable = new ArrayList<>();
@@ -116,7 +117,7 @@ public class BulbGrid {
                     }
                 }
                 if(bulb.y == this.y && bulb.x > this.x) { //down
-                    if (Math.abs(this.x - upBulb.x) > Math.abs(this.x - bulb.x)) {
+                    if (Math.abs(this.x - downBulb.x) > Math.abs(this.x - bulb.x)) {
                         viable.remove(downBulb);
                         viable.add(bulb);
                         downBulb = bulb;
@@ -155,6 +156,18 @@ public class BulbGrid {
             }
             return viable;
         }
+
+        @Override
+        public boolean equals(Object o){
+            if( o == this){return true;}
+            if(!(o instanceof Bulb)){return false;}
+            return this.equals((Bulb)o);
+        }
+
+        public boolean equals (Bulb b){
+            return (b.x == this.x && b.y == this.y);
+        }
+
     }
 
 
