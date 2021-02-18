@@ -18,17 +18,11 @@ public class BulbGrid {
 
     public static List<Point> switchBulbs(String gameMap) {
         return new BulbGrid().switchBulbsNonStatic(gameMap);
-        //Coding like playing game
-//        return i>=exampleSolutions.length ? null :  Arrays.stream(exampleSolutions[i++])
-//                .map( a -> new Point(a[0],a[1]) )
-//                .collect(Collectors.toList());
-
     }
 
 
     public List<Point> switchBulbsNonStatic(String gameMap){
         List<BulbGrid.Bulb> bulbs = new ArrayList<>();
-        // turn the gameMap into a list of bulbs
         String[] gameMapRows = gameMap.split("\n");
         for(int i=0;i<gameMapRows.length;i++){
             for(int j = 0; j<gameMapRows[i].length(); j++){
@@ -37,14 +31,13 @@ public class BulbGrid {
                 }
             }
         }
+        List<Bulb> unvisited = new ArrayList<>();
+        List<Point> path = new ArrayList<>();
 
-        List<Bulb> bulbsOriginal = new ArrayList<>();
-        bulbsOriginal.addAll(bulbs);
-        for(Bulb bulb: bulbsOriginal){
-            List<Bulb> unvisited = new ArrayList<>();
+        for(int i = 0; i<bulbs.size();i++){
+            unvisited.clear();
             unvisited.addAll(bulbs);
-            List<Point> path = new ArrayList<>();
-            unvisited.remove(bulb);
+            Bulb bulb =unvisited.remove(i);
             path.add(new Point(bulb.x, bulb.y));
             List<Point> retPath = recursiveFindPath(path, unvisited,bulbs,bulb);
             if(retPath !=null){return retPath;}
