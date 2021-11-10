@@ -12,14 +12,15 @@ public class TopWords {
             // use index of to remove word
 
         //Words also contain apostrophes, so replace anything that's not a word, number or apostrophe with space
-        String tempString = s;
-        String replacedString = s.replaceAll("[^a-zA-Z0-9']", " ").replaceAll("[\\s]{0,}","\\s");
-        Set<String> uniqueWords = new HashSet<>(Arrays.asList(
-                s.replaceAll("[^a-zA-Z0-9']"," ")
+        String tempString = s.toLowerCase();
+        if(!tempString.contains("[a-zA-Z]")){
+            return new ArrayList<>();
+        }
+        Set<String> uniqueWords = new HashSet<>(Arrays.asList(tempString
+                        .replaceAll("[^a-zA-Z0-9']"," ")
                         .replaceAll("[ ]+"," ")
                         .trim()
                         .split(" ")));
-
         Map<Integer, List<String>> wordCountMap = new HashMap<>();
         for(String word: uniqueWords){
             Integer wordCount = 0;
@@ -27,14 +28,23 @@ public class TopWords {
                 wordCount++;
                 tempString =  tempString.replaceFirst(word,"");
             }
-            if(!wordCountMap.containsKey(new Integer(wordCount))){
-                wordCountMap.put(new Integer(wordCount),new ArrayList<>());
+            if(!wordCountMap.containsKey(wordCount)){
+                wordCountMap.put(wordCount,new ArrayList<>());
                 wordCountMap.get(wordCount).add(word);
             }
             else{
                 wordCountMap.get(wordCount).add(word);
             }
         }
-        return null;
+        List<String> result = new ArrayList<>();
+        Iterator<Integer> itr = new TreeSet<Integer>(wordCountMap.keySet()).descendingIterator();
+        while (itr.hasNext() && result.size()<3){
+            List<String> nextWords = wordCountMap.get(itr.next());
+            for(String word:nextWords){
+                result.add(word);
+                if(result.size()>=3){break;}
+            }
+        }
+        return result;
     }
 }

@@ -23,7 +23,7 @@ public class StreetFighter2 {
     private static  int X_LIMIT;   //0-2
     private static  int Y_LIMIT;    //0-5
 
-    public static String[] streetFighterSelection(String[][] fighters, int[] position, String[] moves) {
+    public static String[] superStreetFighterize(String[][] fighters, int[] position, String[] moves) {
         pointer.x = position[0];
         pointer.y = position[1];
 
@@ -31,10 +31,8 @@ public class StreetFighter2 {
         Y_LIMIT = fighters[0].length-1;
 
         List<String> resultList = new ArrayList<>();
-        Point nextPoint = new Point();
         for(String move: moves){
-            nextPoint = performMove(pointer,move);
-            pointer = fighters[nextPoint.x][nextPoint.y].equals("") ? pointer:nextPoint;
+            pointer = performMove(pointer,move,fighters);
             resultList.add(fighters[pointer.x][pointer.y]);
         }
         return resultList.stream().toArray(String[]::new);
@@ -42,18 +40,31 @@ public class StreetFighter2 {
     }
 
     public static Point performMove(Point currentPointer, String move, String[][] fighters) {
-        int x;
+        int x=  currentPointer.x;
+        int y = currentPointer.y;
         switch (move) {
             case "up":
                 x = currentPointer.x-1<0?0:currentPointer.x-1;
-                return new Point(x,currentPointer.y);
+                return fighters[x][y].equals("") ? currentPointer: new Point(x,y);
             case "down":
                 x = currentPointer.x+1>X_LIMIT?X_LIMIT:currentPointer.x+1;
-                return new Point(x,currentPointer.y);
+                return fighters[x][y].equals("") ? currentPointer: new Point(x,y);
             case "left":
-                return new Point(currentPointer.x ,(currentPointer.y+ Y_LIMIT)%(Y_LIMIT+1));
+                for(int i =0; i<Y_LIMIT;i++){
+                    y = (currentPointer.y+ Y_LIMIT-i)%(Y_LIMIT+1);
+                    if(!fighters[x][y].equals("")){
+                        return new Point(x,y);
+                    }
+                }
+                return currentPointer;
             case "right":
-                return new Point(currentPointer.x ,(currentPointer.y+1)%(Y_LIMIT+1));
+                for(int i =0; i<Y_LIMIT;i++){
+                    y = (currentPointer.y+1+i)%(Y_LIMIT+1);
+                    if(!fighters[x][y].equals("")){
+                        return new Point(x,y);
+                    }
+                }
+                return currentPointer;
             default:
                 return null;
         }
