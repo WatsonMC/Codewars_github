@@ -28,7 +28,12 @@ public class BirdMountainTest {
                 {-1,-1,-1},
                 {0,-1,0}
         };
+        int[][] fromCode = BIrdMountainNew.copyMountain(simpleMountain);
 
-        Assert.assertArrayEquals(simpleResult, BIrdMountainNew.copyMountain(simpleMountain));
+        for(int i = 0; i<simpleResult.length; i++){
+            Assert.assertArrayEquals(simpleResult[i], fromCode[i]);
+
+        }
+
     }
 }
