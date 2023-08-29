@@ -1,0 +1,200 @@
+#
+# There is insufficient memory for the Java Runtime Environment to continue.
+# Native memory allocation (mmap) failed to map 264241152 bytes for Failed to commit area from 0x0000000704e00000 to 0x0000000714a00000 of length 264241152.
+# Possible reasons:
+#   The system is out of physical RAM or swap space
+#   The process is running with CompressedOops enabled, and the Java Heap may be blocking the growth of the native heap
+# Possible solutions:
+#   Reduce memory load on the system
+#   Increase physical memory or swap space
+#   Check if swap backing store is full
+#   Decrease Java heap size (-Xmx/-Xms)
+#   Decrease number of Java threads
+#   Decrease Java thread stack sizes (-Xss)
+#   Set larger code cache with -XX:ReservedCodeCacheSize=
+# This output file may be truncated or incomplete.
+#
+#  Out of Memory Error (os_windows.cpp:3386), pid=27436, tid=37644
+#
+# JRE version:  (11.0.20.1+9) (build )
+# Java VM: OpenJDK 64-Bit Server VM (11.0.20.1+9-LTS, mixed mode, sharing, tiered, compressed oops, g1 gc, windows-amd64)
+# No core dump will be written. Minidumps are not enabled by default on client versions of Windows
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:64231,suspend=y,server=n -ea -Didea.test.cyclic.buffer.size=1048576 -javaagent:C:\Users\watsonmc\AppData\Local\JetBrains\IdeaIC2022.3\captureAgent\debugger-agent.jar -Dfile.encoding=UTF-8 com.intellij.rt.junit.JUnitStarter -ideVersion5 -junit4 PlayerMovementTest
+
+Host: 12th Gen Intel(R) Core(TM) i7-12800H, 20 cores, 15G,  Windows 10 , 64 bit Build 19041 (10.0.19041.3031)
+Time: Tue Aug 29 16:11:20 2023 AUS Eastern Standard Time elapsed time: 0.026205 seconds (0d 0h 0m 0s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x0000026ff91d2800):  JavaThread "Unknown thread" [_thread_in_vm, id=37644, stack(0x000000dcef300000,0x000000dcef400000)]
+
+Stack: [0x000000dcef300000,0x000000dcef400000]
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [jvm.dll+0x62418a]
+V  [jvm.dll+0x7b1d69]
+V  [jvm.dll+0x7b3458]
+V  [jvm.dll+0x7b3b33]
+V  [jvm.dll+0x250148]
+V  [jvm.dll+0x62149a]
+V  [jvm.dll+0x615a55]
+V  [jvm.dll+0x30ab4c]
+V  [jvm.dll+0x30a9d2]
+V  [jvm.dll+0x30f6e6]
+V  [jvm.dll+0x355cef]
+V  [jvm.dll+0x355720]
+V  [jvm.dll+0x2e7ab8]
+V  [jvm.dll+0x2e8c16]
+V  [jvm.dll+0x78bb87]
+V  [jvm.dll+0x78d30f]
+V  [jvm.dll+0x362a49]
+V  [jvm.dll+0x76e9b0]
+V  [jvm.dll+0x3d179f]
+V  [jvm.dll+0x3d3b31]
+C  [jli.dll+0x5227]
+C  [ucrtbase.dll+0x21bb2]
+C  [KERNEL32.DLL+0x17614]
+C  [ntdll.dll+0x526f1]
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x0000026ff6d75490, length=0, elements={
+}
+
+Java Threads: ( => current thread )
+
+Other Threads:
+  0x0000026ff91e4800 GCTaskThread "GC Thread#0" [stack: 0x000000dcef400000,0x000000dcef500000] [id=15824]
+  0x0000026ff9248800 ConcurrentGCThread "G1 Main Marker" [stack: 0x000000dcef500000,0x000000dcef600000] [id=46688]
+  0x0000026ff924b000 ConcurrentGCThread "G1 Conc#0" [stack: 0x000000dcef600000,0x000000dcef700000] [id=45180]
+
+[error occurred during error reporting (printing all threads), id 0xc0000005, EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x00007ff918e672f7]
+
+VM state:not at safepoint (not fully initialized)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x0000026ff91cfbd0] Heap_lock - owner thread: 0x0000026ff91d2800
+
+Heap address: 0x0000000704e00000, size: 4018 MB, Compressed Oops mode: Non-zero based: 0x0000000704e00000
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 0
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (0 events):
+No events
+
+Events (1 events):
+Event: 0.020 Loaded shared library C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\zip.dll
+
+
+Dynamic libraries:
+0x00007ff71cfb0000 - 0x00007ff71cfbd000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\java.exe
+0x00007ff978290000 - 0x00007ff978488000 	C:\WINDOWS\SYSTEM32\ntdll.dll
+0x00007ff976620000 - 0x00007ff9766df000 	C:\WINDOWS\System32\KERNEL32.DLL
+0x00007ff975de0000 - 0x00007ff9760d6000 	C:\WINDOWS\System32\KERNELBASE.dll
+0x00007ff971f40000 - 0x00007ff971fd1000 	C:\WINDOWS\SYSTEM32\apphelp.dll
+0x00007ff975c50000 - 0x00007ff975d50000 	C:\WINDOWS\System32\ucrtbase.dll
+0x00007ff972270000 - 0x00007ff972289000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\VCRUNTIME140.dll
+0x00007ff972290000 - 0x00007ff9722a7000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\jli.dll
+0x00007ff976790000 - 0x00007ff97692d000 	C:\WINDOWS\System32\USER32.dll
+0x00007ff951750000 - 0x00007ff9519ea000 	C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.1110_none_60b5254171f9507e\COMCTL32.dll
+0x00007ff976270000 - 0x00007ff976292000 	C:\WINDOWS\System32\win32u.dll
+0x00007ff9762f0000 - 0x00007ff97638e000 	C:\WINDOWS\System32\msvcrt.dll
+0x00007ff976c90000 - 0x00007ff976cbc000 	C:\WINDOWS\System32\GDI32.dll
+0x00007ff975b30000 - 0x00007ff975c45000 	C:\WINDOWS\System32\gdi32full.dll
+0x00007ff975a20000 - 0x00007ff975abd000 	C:\WINDOWS\System32\msvcp_win.dll
+0x00007ff978050000 - 0x00007ff978080000 	C:\WINDOWS\System32\IMM32.DLL
+0x0000026ff6ff0000 - 0x0000026ff7004000 	C:\WINDOWS\System32\umppc17212.dll
+0x00007ff9741a0000 - 0x00007ff974339000 	C:\Program Files\Avecto\Privilege Guard Client\PGHook.dll
+0x00007ff9766e0000 - 0x00007ff97678f000 	C:\WINDOWS\System32\ADVAPI32.dll
+0x00007ff977fb0000 - 0x00007ff97804c000 	C:\WINDOWS\System32\sechost.dll
+0x00007ff976390000 - 0x00007ff9764b6000 	C:\WINDOWS\System32\RPCRT4.dll
+0x00007ff937f40000 - 0x00007ff937fdb000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\msvcp140.dll
+0x00007ff918b70000 - 0x00007ff9196fb000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\server\jvm.dll
+0x00007ff9775d0000 - 0x00007ff9775d8000 	C:\WINDOWS\System32\PSAPI.DLL
+0x00007ff95c270000 - 0x00007ff95c279000 	C:\WINDOWS\SYSTEM32\WSOCK32.dll
+0x00007ff9773c0000 - 0x00007ff97742b000 	C:\WINDOWS\System32\WS2_32.dll
+0x00007ff9653f0000 - 0x00007ff965417000 	C:\WINDOWS\SYSTEM32\WINMM.dll
+0x00007ff972800000 - 0x00007ff97280a000 	C:\WINDOWS\SYSTEM32\VERSION.dll
+0x00007ff973310000 - 0x00007ff973322000 	C:\WINDOWS\SYSTEM32\kernel.appcore.dll
+0x00007ff9722d0000 - 0x00007ff9722e0000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\verify.dll
+0x00007ff9725d0000 - 0x00007ff9727b4000 	C:\WINDOWS\SYSTEM32\DBGHELP.DLL
+0x00007ff965c10000 - 0x00007ff965c44000 	C:\WINDOWS\SYSTEM32\dbgcore.DLL
+0x00007ff975d50000 - 0x00007ff975dd2000 	C:\WINDOWS\System32\bcryptPrimitives.dll
+0x00007ff96c340000 - 0x00007ff96c368000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\java.dll
+0x00007ff96d770000 - 0x00007ff96d77a000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\jimage.dll
+0x00007ff9501a0000 - 0x00007ff9501d8000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\jdwp.dll
+0x00007ff96d760000 - 0x00007ff96d76e000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\instrument.dll
+0x00007ff96c320000 - 0x00007ff96c338000 	C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\zip.dll
+
+dbghelp: loaded successfully - version: 4.0.5 - missing functions: none
+symbol engine: initialized successfully - sym options: 0x614 - pdb path: .;C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin;C:\WINDOWS\SYSTEM32;C:\WINDOWS\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_6.0.19041.1110_none_60b5254171f9507e;C:\Program Files\Avecto\Privilege Guard Client;C:\Users\watsonmc\.jdks\corretto-11.0.20.1\bin\server
+
+VM Arguments:
+jvm_args: -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:64231,suspend=y,server=n -ea -Didea.test.cyclic.buffer.size=1048576 -javaagent:C:\Users\watsonmc\AppData\Local\JetBrains\IdeaIC2022.3\captureAgent\debugger-agent.jar -Dfile.encoding=UTF-8 
+java_command: com.intellij.rt.junit.JUnitStarter -ideVersion5 -junit4 PlayerMovementTest
+java_class_path (initial): C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2022.3\lib\idea_rt.jar;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2022.3\plugins\junit\lib\junit5-rt.jar;C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2022.3\plugins\junit\lib\junit-rt.jar;C:\Users\watsonmc\Documents\Software\repos\codewars\out\test\Codewars_github;C:\Users\watsonmc\Documents\Software\repos\codewars\out\production\Codewars_github;C:\Users\watsonmc\.m2\repository\org\hamcrest\hamcrest-core\1.3\hamcrest-core-1.3.jar;C:\Users\watsonmc\.m2\repository\junit\junit\4.13.1\junit-4.13.1.jar;C:\Users\watsonmc\.m2\repository\org\junit\jupiter\junit-jupiter\5.8.1\junit-jupiter-5.8.1.jar;C:\Users\watsonmc\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.8.1\junit-jupiter-api-5.8.1.jar;C:\Users\watsonmc\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\watsonmc\.m2\repository\org\junit\platform\junit-platform-commons\1.8.1\junit-platform-commons-1.8.1.jar;C:\Users\watsonmc\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\watsonmc\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.8.1\junit-jupiter-params-5.8.1.jar;C:\Users\watsonmc\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.8.1\junit-jupiter-engine-5.8.1.jar;C:\Users\watsonmc\.m2\repository\org\junit\platform\junit-platform-engine\1.8.1\junit-platform-engine-1.8.1.jar
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 12                                        {product} {ergonomic}
+     uint ConcGCThreads                            = 4                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 15                                        {product} {ergonomic}
+   size_t G1HeapRegionSize                         = 1048576                                   {product} {ergonomic}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 264241152                                 {product} {ergonomic}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 4213178368                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 1048576                                   {product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 7594288                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122031976                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122031976                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+     bool UseCompressedClassPointers               = true                                 {lp64_product} {ergonomic}
+     bool UseCompressedOops                        = true                                 {lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+     bool UseLargePagesIndividualAllocation        = false                                  {pd product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags
+ #1: stderr all=off uptime,level,tags
+
+Environment Variables:
+PATH=C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files\ojdkbuild\java-13-openjdk-jre-13.0.2-1\bin;C:\Program Files (x86)\OpenText\Viewer\bin;c:\Program Files (x86)\Pulse Secure\VC142.CRT\X64\;c:\Program Files (x86)\Pulse Secure\VC142.CRT\X86\;C:\Program Files\dotnet\;C:\ProgramData\chocolatey\bin;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\Microsoft SQL Server\Client SDK\ODBC\170\Tools\Binn\;C:\Users\watsonmc\AppData\Local\Programs\Python\Python311\Scripts;C:\Program Files\Git\cmd;C:\Ruby31-x64\bin;C:\Users\watsonmc\AppData\Local\Microsoft\WindowsApps;C:\Users\watsonmc\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\watsonmc\.dotnet\tools;C:\Users\watsonmc\.dotnet\tools;C:\Users\watsonmc\Downloads\sqlite-tools-win32-x86-3400100
+USERNAME=WatsonMC
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 154 Stepping 3, GenuineIntel
+TMP=C:\Users\watsonmc\AppData\Local\Temp
+TEMP=C:\Users\watsonmc\AppData\Local\Temp
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 10 , 64 bit Build 19041 (10.0.19041.3031)
+OS uptime: 1 days 6:59 hours
+
+CPU:total 20 (initial active 20) (10 cores per cpu, 2 threads per core) family 6 model 154 stepping 3 microcode 0x423, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms, 3dnowpref, lzcnt, ht, tsc, tscinvbit, bmi1, bmi2, adx, sha, fma
+
+Memory: 4k page, system-wide physical 16068M (3921M free)
+TotalPageFile size 20164M (AvailPageFile size 198M)
+current process WorkingSet (physical memory assigned to process): 12M, peak: 12M
+current process commit charge ("private bytes"): 76M, peak: 328M
+
+vm_info: OpenJDK 64-Bit Server VM (11.0.20.1+9-LTS) for windows-amd64 JRE (11.0.20.1+9-LTS), built on Aug 19 2023 03:46:24 by "Administrator" with MS VC++ 15.9 (VS2017)
+
+END.
