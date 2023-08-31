@@ -105,7 +105,7 @@ public class BirdMountainRiver {
 
     /**
      * Returns the available positions in the height array (representing the mountains topographically)
-     * @param heightArray - Array of integers from 0 to n, where n is the tallest point. Any integer greater than 0 is considerec an available landing posn
+     * @param  - Array of integers from 0 to n, where n is the tallest point. Any integer greater than 0 is considerec an available landing posn
      * @return
      */
     public static int getAvailablePositions(char[][] mountain){
