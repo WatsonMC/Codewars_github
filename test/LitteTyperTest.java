@@ -23,8 +23,8 @@ public class LitteTyperTest {
         String bt1 = "(s1)";
 //        Assert.assertEquals("( s1 )",LittleTyper.cleanSpaces(bt1) );
 
-        String bt2 = ("( asdf 123) ((asdf))(123 )");
-        Assert.assertEquals("( asdf 123 ) ( ( asdf ) ) ( 123 )",LittleTyper.cleanSpaces(bt2) );
+        String bt2 = ("( asdf 123) ((asdf))(123 )()()");
+        Assert.assertEquals("( asdf 123 ) ( ( asdf ) ) ( 123 ) ( ) ( )",LittleTyper.cleanSpaces(bt2) );
 
     }
 }
