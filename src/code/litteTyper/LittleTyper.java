@@ -17,12 +17,54 @@ public class LittleTyper {
      * Any parentheses wrapping just a single item
      *  Any parentheses wrapping just other parentheses
      *
-     * @param input
+     * @param input cleaned through cleaned spaces.
      *  always has
      * @return
      */
-    public String cleanParentheses(String input){
-        return "";
+    public static String cleanParentheses(String input){
+//        input = cleanSpaces(input);
+        //Question -> do we have to take append ( List -> List ) into append List -> List ?     In tbis case might need to also clean any
+        //times whenre brackets surroun only types
+
+        //simple mode
+        String tempString = input;
+
+        String singleBracketReg = "\\(\\s[a-zA-Z0-9]+\\s\\)";
+        boolean noChange = true;
+        while (noChange){
+            tempString = input;
+            Matcher matcher = Pattern.compile(singleBracketReg).matcher(input);
+            while (matcher.find()){
+                //matcher,start now contains start ], matcher
+
+                tempString = input.substring(0,matcher.start()) + " "
+                        + input.substring(matcher.start() + 1,matcher.end()-1) + " ";
+                if(matcher.end() != input.length()){
+                    tempString = tempString+ input.substring(matcher.end() );
+                }
+
+            }
+            tempString= cleanSpaces(tempString.replaceAll("\\(\\s\\)",""));
+            noChange = tempString !=input;
+            input = tempString;
+            System.out.print(input + "\n");
+        }
+        return tempString;
+
+
+
+//        int eleCount=0;
+//        int depth = 0;
+//        for(String element:input.split(" ")){
+//            if(element.equals("(")){
+//                depth ++;
+//                eleCount = 0;
+//            } else if(element.equals(")")){
+//                if(eleCount == 1){
+//                    //single word
+//                }
+//            }
+//        }
     }
 
     /**
@@ -47,7 +89,7 @@ public class LittleTyper {
         tempString = insertByRegex(arrowRight,tempString, "> ",0);
         tempString = insertByRegex(scLeft,tempString, " :",1);
         tempString = insertByRegex(scRight,tempString, ": ",0);
-        return tempString.replaceAll(multiSpaceRegex, " ");
+        return tempString.replaceAll(multiSpaceRegex, " ").trim()   ;
     }
 
     /**

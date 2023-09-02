@@ -1,6 +1,7 @@
 import code.litteTyper.LittleTyper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 
 public class LitteTyperTest {
 
@@ -50,6 +51,18 @@ public class LitteTyperTest {
                 " aB : A -> B\n" +
                 " bA : B -> A";
         Assert.assertEquals(contextHardResult,LittleTyper.cleanSpaces(contextHard));
+
+    }
+
+    @Test
+    public void testCleanParenth(){
+        String testSimple = "( test )";
+        String testSimple2 = " ( test ( test2 ) )";
+        String testSimple3 = " () () test (test (test) )";
+        Assertions.assertEquals("test", LittleTyper.cleanParentheses(testSimple));
+        Assertions.assertEquals("( test test2 )", LittleTyper.cleanParentheses(testSimple2));
+        Assertions.assertEquals("test ( test test )", LittleTyper.cleanParentheses(testSimple3));
+
 
     }
 }
