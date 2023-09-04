@@ -3,6 +3,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LitteTyperTest {
 
     @Test
@@ -63,6 +66,39 @@ public class LitteTyperTest {
         Assertions.assertEquals("( test test2 )", LittleTyper.cleanParentheses(testSimple2));
         Assertions.assertEquals("test ( test test )", LittleTyper.cleanParentheses(testSimple3));
 
+
+    }
+
+    @Test
+    public void testFunction(){
+        String func1 = "func1 : A -> B";
+        List<String> func1List =new ArrayList<String>(){{
+            add("A");
+            add("B");
+        }};
+        //chec name
+        //heck types
+        LittleTyper.Function f1 = new LittleTyper.Function(func1);
+        Assertions.assertEquals(f1.getName() ,"func1");
+        Assertions.assertEquals(f1.getTypes(), func1List );
+
+
+        String func2 = "func2 : A -> ( B -> C ) -> D";
+        List<String> func2List =new ArrayList<String>(){{
+            add("A");
+            add("B -> C");
+            add("D");
+        }};
+        LittleTyper.Function f2 = new LittleTyper.Function(func2);
+        Assertions.assertEquals(func2List, f2.getTypes() );
+
+        String func3 = "Function : (A->B) -> ((A->B) -> (A->B))";
+        List<String> func3List =new ArrayList<String>(){{
+            add("A -> B");
+            add("( A -> B ) -> ( A -> B )");
+        }};
+        LittleTyper.Function f3 = new LittleTyper.Function(func3);
+        Assertions.assertEquals(func3List, f3.getTypes() );
 
     }
 }
