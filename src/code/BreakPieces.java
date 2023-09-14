@@ -15,7 +15,6 @@ public class BreakPieces {
      *
      */
 
-
     /**
      * @param shape
      * @return
@@ -50,17 +49,36 @@ public class BreakPieces {
                     //thats defined by
                         //(x-1,y-1),(x,y-1),(x-1,y) are all
                     List<Node> neighbours= grid.getNeighbours(x,y);
-
+                    String cornerString =neighbours.get(0).value + neighbours.get(1).value + neighbours.get(2).value;
+                    if(matchCorner(cornerString)){
+                        //in shape, begin shape traversal
+                        List<Node> newShape = traverseShape(x,y,grid);
+                    }else{
+                        //not i shape, continue
+                    }
                 }
             }
         }
-
-
-
-
-
         return empty;
     }
+
+    /**
+     * Takes an x,y grid location and a grid object and finds it's extents.
+     * Adds any neighbour nodes which are space to a 'to check' list, adding each to the shape
+     * Finishes when no new space nodes exist in current ndoe neighbours and to check list is empty
+     *
+     * Returns list of Nodes from the grid constituting the shape
+     * @param x
+     * @param y
+     * @param grid
+     * @return
+     */
+    public static List<Node> traverseShape(int x, int y, DiaGrid grid){
+        List<Node>
+        return new ArrayList<>();
+    }
+
+    public static boolean matchCorner(String cornerString){return cornerString.matches("(\\+\\+\\+)|(\\+\\+\\-)|(\\|\\+\\-)|(\\|\\+\\+)");}
 
     public static class DiaGrid{
         /**
@@ -77,7 +95,6 @@ public class BreakPieces {
          *
          */
         Map<Integer, Map<Integer,Node>> grid;
-
         public DiaGrid(String diagram){
             grid = new HashMap<>();
             String[] lines = diagram.split("\n");
@@ -100,10 +117,10 @@ public class BreakPieces {
          *          |
          *
          *  Where the neighbours exist the nodes from the grid are retrned. ELse a node with the imaginary neighbours coords and an isnull status are returned.
-         *  List order is maontained
-         * @param x
-         * @param y
-         * @return
+         *  List order is
+         * @param x = node x posn
+         * @param y = node y posn
+         * @return List of Nodes in order shown aove
          */
         public List<Node> getNeighbours(int x, int y){
             int[] x_i = {
@@ -113,8 +130,8 @@ public class BreakPieces {
                     y,y-1,y-1,y-1,y,y+1,y+1,y+1
             };
             List<Node> neigbours = new ArrayList<>();
-            for(int i =0;i<6;i++){
-                if (!this.getValue(x, y).equals("N")) {
+            for(int i =0;i<8;i++){
+                if (!this.getValue(x_i[i],y_i[i]).equals("N")) {
                     //mange not null
                     neigbours.add(this.getNode(x_i[i],y_i[i]));
                 }
@@ -125,7 +142,6 @@ public class BreakPieces {
             }
             return neigbours;
         }
-
         public Node getNode(int x, int y){
             if(getValue(x,y) .equals("N")){
                 System.out.println("ERROR: getNode on null node");
@@ -139,9 +155,8 @@ public class BreakPieces {
          * returns "N" if not part of grid
          * @param x
          * @param y
-         * @return
+         * @return Either the node value, or 'N' if co-ordinates are not part of grid
          */
-
         public String getValue(int x, int y){
             if(grid.keySet().contains(y) && grid.get(y).keySet().contains(x)){
                 return grid.get(y).get(x).value;
@@ -188,6 +203,18 @@ public class BreakPieces {
             }
         }
         public boolean IsNull(){return this.isNull;}
+
+        @Override
+        public boolean equals(Object obj){
+            if(obj instanceof Node){
+                return this.equals((Node)obj);
+            }else{
+                return false;
+            }
+        }
+        public boolean equals(Node newNode){
+            return  newNode.x == this.x &&  newNode.y == this.y && newNode.value.equals(this.value) && this.isNull == newNode.isNull;
+        }
     }
 
 
