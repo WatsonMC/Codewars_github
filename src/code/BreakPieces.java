@@ -22,6 +22,8 @@ public class BreakPieces {
     public static String[] process(String shape) {
         String[] empty = {"1"};
 
+        Set<Set<Node>> shapes = new HashSet<>();
+        Set<Node> shapeNodes = new HashSet<>();
         DiaGrid grid = new DiaGrid(shape);
         boolean inShape = false;
         int xLim;
@@ -34,14 +36,14 @@ public class BreakPieces {
 
         //begin main loop through shapestrings
         for(int y = 0; y<yLim;y++){
-
             for(int x = 0; x < xLim ; x++){
+                Node current = grid.getNode(x,y);
                 //cases:
                     // + do nffin
                     // | do nffn
                     // - do nffn
                     // "" do lots
-                if(grid.getValue(x,y).equals(" ")){
+                if(current.value.equals(" ") && !shapeNodes.contains(current)){
                     //check if neighbour pattern mattches start of shape
                     // start of shape match
                     // +++, |+-,|++,++-  <== yes
@@ -52,30 +54,82 @@ public class BreakPieces {
                     String cornerString =neighbours.get(0).value + neighbours.get(1).value + neighbours.get(2).value;
                     if(matchCorner(cornerString)){
                         //in shape, begin shape traversal
-                        List<Node> newShape = traverseShape(x,y,grid);
+                        Set<Node> newShape = traverseShape(current,grid);
+                        shapes.add(newShape);
+                        shapeNodes.addAll(newShape);
+                        //TODO consider standardizigin references iether by XY or by NOde, currently trav takes node, but main loop i sxY
                     }else{
                         //not i shape, continue
                     }
                 }
             }
         }
+
+
         return empty;
     }
 
     /**
-     * Takes an x,y grid location and a grid object and finds it's extents.
+     * Creates a print string of the shape set passed
+     * @param shape
+     * @return
+     */
+    public String printShape(Set<Node> shape){
+            Set<Node> edges = new HashSet<>();
+            List<List<Character>> printArray;
+            int min_x = 10000;
+            int min_y = 10000;
+            int max_x= 0;
+            int max_y = 0;
+            for(Node curNode: shape){
+                int[][] neighBourCoord = DiaGrid.getNeighbourCoords(curNode.x, curNode.y);
+                for(int i=0; i<8; i++){
+                    int x = neighBourCoord[i][0];
+                    int y = neighBourCoord[i][1];
+                    min_x = x<min_x ? x:min_x;
+                    min_y = y<min_y ? y:min_y;
+                    max_x = x>max_x ? x:max_x;
+                    max_y = y>max_y ? y:max_y;
+                    Node testNode = new Node(x,y," ");
+                    if(!shape.contains(testNode)){
+                        edges.add(new Node(x,y,"+"));
+                    }
+                }
+            }
+
+
+
+        return "";
+    }
+
+    /**
+     * Takes a node and a grid object and finds it's extents.
      * Adds any neighbour nodes which are space to a 'to check' list, adding each to the shape
      * Finishes when no new space nodes exist in current ndoe neighbours and to check list is empty
      *
      * Returns list of Nodes from the grid constituting the shape
-     * @param x
-     * @param y
+     * @param node
      * @param grid
      * @return
      */
-    public static List<Node> traverseShape(int x, int y, DiaGrid grid){
-        List<Node>
-        return new ArrayList<>();
+    public static Set<Node> traverseShape(Node node, DiaGrid grid){
+        Set<Node> shapeNodes = new HashSet<>();
+        List<Node> neighbours;
+        List<Node> toCheck = new ArrayList<>();
+        Node current;
+        toCheck.add(node);
+        while (! toCheck.isEmpty()){
+            current = toCheck.remove(0);
+//            System.out.println(current.toString());
+            shapeNodes.add(current);
+            neighbours = grid.getNeighbours(current.x, current.y);
+            for(Node neighbour :neighbours){
+                if(!toCheck.contains(neighbour) && !shapeNodes.contains(neighbour) &&  neighbour.value.equals(" ")){
+                    toCheck.add(neighbour);
+                }
+            }
+        }
+        return new HashSet<>(shapeNodes);
     }
 
     public static boolean matchCorner(String cornerString){return cornerString.matches("(\\+\\+\\+)|(\\+\\+\\-)|(\\|\\+\\-)|(\\|\\+\\+)");}
@@ -123,25 +177,49 @@ public class BreakPieces {
          * @return List of Nodes in order shown aove
          */
         public List<Node> getNeighbours(int x, int y){
-            int[] x_i = {
-                    x-1,x-1,x,x+1,x+1,x+1,x,x-1
-            };
-            int[] y_i = {
-                    y,y-1,y-1,y-1,y,y+1,y+1,y+1
-            };
+            int[][] x_y = getNeighbourCoords(x,y);
+            int x_i;
+            int y_i;
+
             List<Node> neigbours = new ArrayList<>();
             for(int i =0;i<8;i++){
-                if (!this.getValue(x_i[i],y_i[i]).equals("N")) {
+                x_i = x_y[i][0];
+                y_i = x_y[i][1];
+                if (!this.getValue(x_i ,y_i).equals("N")) {
                     //mange not null
-                    neigbours.add(this.getNode(x_i[i],y_i[i]));
+                    neigbours.add(this.getNode(x_i,y_i));
                 }
                 else{
                     //manage  null
-                    neigbours.add(new Node(x_i[i],y_i[i],"N"));
+                    neigbours.add(new Node(x_i,y_i,"N"));
                 }
             }
             return neigbours;
         }
+
+
+        /**
+         * Gets an int array of x,y coords for neighgours of a node based on co-ords
+         * @param x
+         * @param y
+         * @return
+         */
+        public static int[][] getNeighbourCoords(int x, int y){
+            int[][] result = {
+                    new int[] {x-1,y},
+                    new int[] {x-1,y-1},
+                    new int[] {x,y-1},
+                    new int[] {x+1,y-1},
+                    new int[] {x+1,y},
+                    new int[] {x+1,y+1},
+                    new int[] {x,y+1},
+                    new int[] {x-1,y+1},
+                    new int[] {x-1,y+1},
+            };
+            return result;
+
+        }
+
         public Node getNode(int x, int y){
             if(getValue(x,y) .equals("N")){
                 System.out.println("ERROR: getNode on null node");
@@ -205,9 +283,20 @@ public class BreakPieces {
         public boolean IsNull(){return this.isNull;}
 
         @Override
-        public boolean equals(Object obj){
-            if(obj instanceof Node){
-                return this.equals((Node)obj);
+        public String toString(){
+            return "(" + this.x + ", " + this.y + "):" + this.value;
+        }
+
+        @Override
+        public int hashCode(){
+            int charValue = this.value.charAt(0);
+            return this.x + this.y + charValue;
+        }
+
+        @Override
+        public boolean equals(Object o){
+            if(o instanceof Node){
+                return this.equals((Node) o);
             }else{
                 return false;
             }

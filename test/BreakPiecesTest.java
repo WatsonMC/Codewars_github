@@ -4,7 +4,9 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BreakPiecesTest {
     static BreakPieces bp_common = new BreakPieces();
@@ -94,6 +96,52 @@ public class BreakPiecesTest {
     }
 
     @Test
+    public void testShapeTravsersal(){
+        //Simple test
+        Set<BreakPieces.Node> shapeNodes = BreakPieces.traverseShape(grid_common.getNode(1,1),grid_common);
+        List<BreakPieces.Node> expectedNodes = new ArrayList<>();
+        expectedNodes.add(new BreakPieces.Node(1,1," "));
+        expectedNodes.add(new BreakPieces.Node(2,1," "));
+        expectedNodes.add(new BreakPieces.Node(3,1," "));
+        expectedNodes.add(new BreakPieces.Node(1,2," "));
+        expectedNodes.add(new BreakPieces.Node(2,2," "));
+        expectedNodes.add(new BreakPieces.Node(3,2," "));
+
+        Assertions.assertEquals(expectedNodes.size(), shapeNodes.size());
+        Assertions.assertTrue(shapeNodes.containsAll(expectedNodes));
+
+        //complicated
+        String testgrid =   "+---+   " + "\n" +
+                            "|   +--+"+ "\n" +
+                            "|      |" +"\n" +
+                            "+-+    |" +"\n" +
+                            "  +----+";
+        BreakPieces.DiaGrid grid2 = new BreakPieces.DiaGrid(testgrid);
+        shapeNodes = BreakPieces.traverseShape(grid2.getNode(1,1),grid2);
+        expectedNodes = new ArrayList<>();
+        expectedNodes.add(new BreakPieces.Node(1,1," "));
+        expectedNodes.add(new BreakPieces.Node(2,1," "));
+        expectedNodes.add(new BreakPieces.Node(3,1," "));
+
+        expectedNodes.add(new BreakPieces.Node(1,2," "));
+        expectedNodes.add(new BreakPieces.Node(2,2," "));
+        expectedNodes.add(new BreakPieces.Node(3,2," "));
+        expectedNodes.add(new BreakPieces.Node(4,2," "));
+        expectedNodes.add(new BreakPieces.Node(5,2," "));
+        expectedNodes.add(new BreakPieces.Node(6,2," "));
+
+        expectedNodes.add(new BreakPieces.Node(3,3," "));
+        expectedNodes.add(new BreakPieces.Node(4,3," "));
+        expectedNodes.add(new BreakPieces.Node(5,3," "));
+        expectedNodes.add(new BreakPieces.Node(6,3," "));
+
+
+        Assertions.assertEquals(expectedNodes.size(), shapeNodes.size());
+        Assertions.assertTrue(shapeNodes.containsAll(expectedNodes));
+
+    }
+
+    @Test
     public void testCornerDetection(){
         String[] yesTest = {
                 "+++",
@@ -115,5 +163,15 @@ public class BreakPiecesTest {
         }
     }
 
+    @Test
+    public void testNodeEquals(){
+        BreakPieces.Node node1 = new BreakPieces.Node(1,1," ");
+        BreakPieces.Node node2 = new BreakPieces.Node(1,1," ");
+        Assertions.assertEquals(node1,node2);
 
+        Set<BreakPieces.Node> testSet =  new HashSet<>();
+        testSet.add(node1);
+        Assertions.assertTrue(testSet.contains(node2));
+
+    }
 }
