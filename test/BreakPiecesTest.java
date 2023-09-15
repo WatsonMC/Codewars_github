@@ -10,15 +10,76 @@ import java.util.Set;
 
 public class BreakPiecesTest {
     static BreakPieces bp_common = new BreakPieces();
+    static BreakPieces bp_complex = new BreakPieces();
+
+    static String testgrid;
+    static String complicatedGrid;
+
+    static String testMulti;
+
+    static String testInterlock;
+
     static BreakPieces.DiaGrid grid_common;
+    static BreakPieces.DiaGrid grid_complex;
+
     @BeforeClass
     public static void setup(){
-        String testgrid =   "+---+" + "\n" +
+        testgrid =   "+---+" + "\n" +
                             "|   |"+ "\n" +
                             "|   |" +"\n" +
                             "+---+";
         grid_common = bp_common.gridGen(testgrid);
+
+        complicatedGrid =   "+---+   " + "\n" +
+                                    "|   +--+"+ "\n" +
+                                    "|      |" +"\n" +
+                                    "+-+    |" +"\n" +
+                                    "  +----+";
+
+        grid_complex = bp_complex.gridGen(complicatedGrid);
+
+        testMulti = "+------------+\n" +
+        "|            |\n" +
+        "|            |\n" +
+        "|            |\n"+
+        "+------+-----+\n"+
+        "|      |     |\n"+
+        "|      |     |\n"+
+        "+------+-----+";
+
+        testInterlock = "+-------------------+--+\n"+
+                "|                   |  |\n"+
+                "|                   |  |\n"+
+                "|  +----------------+  |\n"+
+                "|  |                   |\n"+
+                "|  |                   |\n"+
+                "+--+-------------------+";
+
     }
+
+    @Test
+    public void testAll(){
+        String[] commonShapeStrigs = BreakPieces.process(testgrid);
+        String[] complexShapes = BreakPieces.process(complicatedGrid);
+        String[] multiShapes = BreakPieces.process(testMulti);
+        String[] interlock = BreakPieces.process(testInterlock);
+
+        for(String shape: complexShapes){
+            System.out.println(shape);
+        }
+        for(String shape: commonShapeStrigs){
+            System.out.println(shape);
+        }
+        for(String shape: multiShapes){
+            System.out.println(shape);
+        }
+        for(String shape: interlock){
+            System.out.println(shape);
+        }
+
+
+    }
+
 
     @Test
     public void testGridCreation(){
@@ -174,4 +235,16 @@ public class BreakPiecesTest {
         Assertions.assertTrue(testSet.contains(node2));
 
     }
+
+    @Test
+    public void testPrintShape(){
+        Set<BreakPieces.Node> shape = BreakPieces.traverseShape(new BreakPieces.Node(1,1," "),grid_common);
+        String printString = BreakPieces.printShape(shape);
+        System.out.println(printString);
+
+        shape = BreakPieces.traverseShape(new BreakPieces.Node(1,1," "),grid_complex);
+        printString = BreakPieces.printShape(shape);
+        System.out.println(printString);
+    }
 }
+

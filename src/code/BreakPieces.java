@@ -2,6 +2,7 @@ package code;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BreakPieces {
     /**
@@ -20,7 +21,7 @@ public class BreakPieces {
      * @return
      */
     public static String[] process(String shape) {
-        String[] empty = {"1"};
+        String[] shapeStrings;
 
         Set<Set<Node>> shapes = new HashSet<>();
         Set<Node> shapeNodes = new HashSet<>();
@@ -64,9 +65,9 @@ public class BreakPieces {
                 }
             }
         }
+        shapeStrings = shapes.stream().map(x ->printShape(x)).toArray(String[]::new);
 
-
-        return empty;
+        return shapeStrings;
     }
 
     /**
@@ -74,32 +75,62 @@ public class BreakPieces {
      * @param shape
      * @return
      */
-    public String printShape(Set<Node> shape){
-            Set<Node> edges = new HashSet<>();
-            List<List<Character>> printArray;
-            int min_x = 10000;
-            int min_y = 10000;
-            int max_x= 0;
-            int max_y = 0;
-            for(Node curNode: shape){
-                int[][] neighBourCoord = DiaGrid.getNeighbourCoords(curNode.x, curNode.y);
-                for(int i=0; i<8; i++){
-                    int x = neighBourCoord[i][0];
-                    int y = neighBourCoord[i][1];
-                    min_x = x<min_x ? x:min_x;
-                    min_y = y<min_y ? y:min_y;
-                    max_x = x>max_x ? x:max_x;
-                    max_y = y>max_y ? y:max_y;
-                    Node testNode = new Node(x,y," ");
-                    if(!shape.contains(testNode)){
-                        edges.add(new Node(x,y,"+"));
-                    }
+    public static String printShape(Set<Node> shape){
+        //Creates an X,Y nested list of characters which will be populatd with the edges of the shape
+        Set<Node> edges = new HashSet<>();
+        int min_x = 10000;
+        int min_y = 10000;
+        int max_x= 0;
+        int max_y = 0;
+        for(Node curNode: shape){
+            int[][] neighBourCoord = DiaGrid.getNeighbourCoords(curNode.x, curNode.y);
+            for(int i=0; i<8; i++){
+                int x = neighBourCoord[i][0];
+                int y = neighBourCoord[i][1];
+                min_x = x<min_x ? x:min_x;
+                min_y = y<min_y ? y:min_y;
+                max_x = x+1>max_x ? x+1:max_x;
+                max_y = y+1>max_y ? y+1:max_y;
+                if(!shape.contains(new Node(x,y," "))){
+                    edges.add(new Node(x,y,"+"));
                 }
             }
+        }
 
+        String[][] printArr =  new String[max_y][max_x];
+        for(Node edgeNode: edges){
+            printArr[edgeNode.y][edgeNode.x] = getEdgeType(edgeNode,edges);
+        }
+        StringBuilder sb =  new StringBuilder();
+        for(int y_i = min_y; y_i<max_y; y_i++){
+            for(int x_i = min_x; x_i<max_x; x_i++){
+                sb.append(printArr[y_i][x_i] == null ? " ":printArr[y_i][x_i]);
+            }
+            sb.append("\n");
+        }
+        return sb.deleteCharAt(sb.length()-1).toString().replaceAll("\\s+\\n","\n").replaceAll("\\s+$","");
+    }
 
-
-        return "";
+    /**
+     * evaulates the given edge node against supplied edge nodes and returns the required shape edge.
+     * Either '-', '+' or '|'
+     * Edge nodes shoujld be of undefined value'+'
+     * @param edgeNode
+     * @param edgeNodes
+     * @return
+     */
+    public static String getEdgeType(Node edgeNode, Set<Node> edgeNodes){
+        int[][] neighbours = DiaGrid.getNeighbourCoords(edgeNode.x,edgeNode.y);
+        Node left = new Node(neighbours[0][0],neighbours[0][1],"+");
+        Node right= new Node(neighbours[4][0],neighbours[4][1],"+");
+        Node up= new Node(neighbours[2][0],neighbours[2][1],"+");
+        Node down= new Node(neighbours[6][0],neighbours[6][1],"+");
+        if((edgeNodes.contains(up) && edgeNodes.contains(down)) && !(edgeNodes.contains(left) || edgeNodes.contains(right))){
+            return "|";
+        }else if((edgeNodes.contains(left) && edgeNodes.contains(right)) && !(edgeNodes.contains(up) || edgeNodes.contains(down))){
+            return "-";
+        }
+        else return "+";
     }
 
     /**
