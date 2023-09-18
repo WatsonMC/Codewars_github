@@ -2,7 +2,6 @@ package code;
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class BreakPieces {
     /**
@@ -26,11 +25,8 @@ public class BreakPieces {
         Set<Set<Node>> shapes = new HashSet<>();
         Set<Node> shapeNodes = new HashSet<>();
         DiaGrid grid = new DiaGrid(shape);
-        boolean inShape = false;
         int xLim;
         int yLim;
-        //need to iterate through the grid coorinates
-        //do I want a list of corindates based on an xy, or a list of node objects ordred in the order I want to process them
 
         xLim =grid.getXLim();
         yLim = grid.getYLim();
@@ -39,28 +35,13 @@ public class BreakPieces {
         for(int y = 0; y<yLim;y++){
             for(int x = 0; x < xLim ; x++){
                 Node current = grid.getNode(x,y);
-                //cases:
-                    // + do nffin
-                    // | do nffn
-                    // - do nffn
-                    // "" do lots
                 if(current.value.equals(" ") && !shapeNodes.contains(current)){
-                    //check if neighbour pattern mattches start of shape
-                    // start of shape match
-                    // +++, |+-,|++,++-  <== yes
-                    // -+|, ---
-                    //thats defined by
-                        //(x-1,y-1),(x,y-1),(x-1,y) are all
                     List<Node> neighbours= grid.getNeighbours(x,y);
                     String cornerString =neighbours.get(0).value + neighbours.get(1).value + neighbours.get(2).value;
                     if(matchCorner(cornerString)){
-                        //in shape, begin shape traversal
                         Set<Node> newShape = traverseShape(current,grid);
-                        shapes.add(newShape);
+                        shapes.add(traverseShape(current,grid));
                         shapeNodes.addAll(newShape);
-                        //TODO consider standardizigin references iether by XY or by NOde, currently trav takes node, but main loop i sxY
-                    }else{
-                        //not i shape, continue
                     }
                 }
             }
@@ -151,7 +132,6 @@ public class BreakPieces {
         toCheck.add(node);
         while (! toCheck.isEmpty()){
             current = toCheck.remove(0);
-//            System.out.println(current.toString());
             shapeNodes.add(current);
             neighbours = grid.getNeighbours(current.x, current.y);
             for(Node neighbour :neighbours){
