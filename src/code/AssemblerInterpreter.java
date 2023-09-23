@@ -3,7 +3,12 @@ package code;
 import java.util.*;
 
 public class AssemblerInterpreter {
-
+    //Extended from CalculusBear's solution to 'Simple Assembler Interpeter'
+    static String output = null;
+    public static String interpret(final String input) {
+        // Your code here!
+        return output;
+    }
     private static class Environment{
         private static Map<String,Integer> registers = new HashMap<>();
         private static Map<String,Integer> labels = new HashMap<>();
@@ -55,23 +60,20 @@ public class AssemblerInterpreter {
         }
 
         public static Integer removeFromStack(){
-            return callStack.pop()
+            return callStack.pop();
         }
 
     }
 
     private static abstract class Command{
-        String arg1;
-        Command(String arg1){
-            this.arg1 = arg1;
-        }
         public abstract void call();
     }
-    //JUMP COMMANDS
+    //JUMP COMMANDS rest of them
     public static class JmpCommand extends Command{
         String label;
+        String arg1;
         JmpCommand(String arg1, String label){
-            super(arg1);
+            this.arg1 = arg1;
             this.label =label;
         }
         @Override
@@ -83,10 +85,10 @@ public class AssemblerInterpreter {
 
     //ARITH COMMANDS
     public static class CmpCommand extends Command{
-
+        String arg1;
         String arg2;
         CmpCommand(String arg1, String arg2){
-            super(arg1);
+            this.arg1 =arg1;
             this.arg2  = arg2;
         }
 
@@ -102,9 +104,10 @@ public class AssemblerInterpreter {
         }
     }
     private static class DivCommand extends Command{
+        String arg1;
         String arg2;
         DivCommand(String arg1, String arg2){
-            super(arg1);
+            this.arg1 = arg1;
             this.arg2 = arg2;
         }
         @Override
@@ -113,9 +116,10 @@ public class AssemblerInterpreter {
         }
     }
     private static class MulCommand extends Command{
+        String arg1;
         String arg2;
         MulCommand(String arg1, String arg2){
-            super(arg1);
+            this.arg1  =arg1;
             this.arg2 = arg2;
         }
         @Override
@@ -124,8 +128,9 @@ public class AssemblerInterpreter {
         }
     }
     private static class IncCommand extends Command{
+        String arg1;
         IncCommand(String arg1){
-            super(arg1);
+            this.arg1  =arg1;
         }
 
         @Override
@@ -135,8 +140,9 @@ public class AssemblerInterpreter {
         }
     }
     private static class DecCommand extends Command{
+        String arg1;
         DecCommand(String arg1){
-            super(arg1);
+            this.arg1  =arg1;
         }
         @Override
         public void call(){
@@ -145,9 +151,10 @@ public class AssemblerInterpreter {
         }
     }
     private static class SubtractCommand extends Command{
+        String arg1;
         String arg2;
         SubtractCommand(String arg1, String arg2){
-            super(arg1);
+            this.arg1  =arg1;
             this.arg2 = arg2;
         }
         @Override
@@ -158,8 +165,9 @@ public class AssemblerInterpreter {
     }
     private static class AddCommand extends Command{
         String arg2;
+        String arg1;
         AddCommand(String arg1, String arg2){
-            super(arg1);
+            this.arg1  =arg1;
             this.arg2 = arg2;
         }
         @Override
@@ -172,8 +180,9 @@ public class AssemblerInterpreter {
     //PROC COMMANDS
     private static class MovCommand extends Command{
         private String arg2;
+        String arg1;
         MovCommand(String arg1, String arg2){
-            super(arg1);
+            this.arg1  =arg1;
             this.arg2 = arg2;
         }
         @Override
@@ -181,11 +190,11 @@ public class AssemblerInterpreter {
             Environment.setRegister(arg1, Environment.getRegOrValue(arg2));
         }
     }
-
     private static class LblCommand extends Command{
+        String arg1;
         Integer pointer;
         LblCommand(String arg1, Integer pointer){
-            super(arg1);
+            this.arg1  =arg1;
             this.pointer = pointer;
             call();
         }
@@ -195,22 +204,17 @@ public class AssemblerInterpreter {
             Environment.setLabelPointer(arg1,pointer);
         }
     }
-
     private static class RetCommand extends Command{
-        RetCommand(String arg1){
-            super(arg1);    //unneeded, prefer composition over inheritence here...
-        }
-
         @Override
         public void call(){
             Environment.setPointer(Environment.removeFromStack());
         }
     }
-
     public static class CallCommand extends Command{
         Integer pointer;
+        String arg1;
         CallCommand(String arg1, Integer pointer){
-            super(arg1);
+            this.arg1  =arg1;
             this.pointer = pointer;
         }
 
@@ -220,5 +224,51 @@ public class AssemblerInterpreter {
             Environment.setPointer(Environment.getLabelPointer(arg1));
         }
     }
+
+    //end command
+    //msg command
+    private static class CommandFactory{
+        /**
+         * Command types
+         * 2 input
+         * - mov
+         * - add
+         * - sub
+         * - div
+         * - mul
+         * - cmp
+         *
+         * 1 input
+         * - jmps
+         * - call
+         * - dec
+         * - inc
+         *
+         * Pointer input
+         * - label
+         *
+         * Infinite input
+         * - msg
+         *
+         * no inputs
+         * ret
+         * end
+         * comment
+         *
+         *
+         */
+        public static Command createCommand(String commandString){
+            String commandType = commandString.trim().split(" ")[0];
+            String[] commandWithArgs = commandString.trim().split(" ");
+            Command command;
+            switch (commandType){
+                case "mov": String mov;
+                case  "inc":   command = new IncCommand(commandWithArgs[1]);
+            }
+
+
+        }
+    }
+
 
 }
