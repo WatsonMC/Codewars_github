@@ -1,8 +1,33 @@
+import code.AssemblerInterpreter;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import org.junit.runners.JUnit4;
 
 public class AssemblerInterpreterTest {
+
+    @Test
+    public void testMsg(){
+        code.AssemblerInterpreter.Environment.setRegister("a",109);
+        String pgrm = "mov a 109\n" +
+                "msg  '(5+1)/2 = ', a\n"+
+                "end";
+
+        String pgrmOut = AssemblerInterpreter.interpret(pgrm);
+        System.out.println(pgrmOut);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @Test
     public void sampleTests() {
