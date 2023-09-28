@@ -4,42 +4,47 @@ import java.util.*;
 
 public class AssemblerInterpreter {
     //Extended from CalculusBear's solution to 'Simple Assembler Interpeter'
-    static String output = null;
     public static String interpret(final String input) {
         // Your code here!
-        List<Command> commands = new ArrayList<>();
+        Environment.clear();
         int pointer = 0;
         for(String commandString: input.split("\n")){
-            commands.add(CommandFactory.createCommand(commandString,pointer));
+            if(commandString.length()>0 && commandString.indexOf(";")!=0){
+                Environment.addCommand(CommandFactory.createCommand(commandString,pointer));
+            }
             pointer++;
         }
-        pointer = 0;
-        while(pointer >=0){
-            commands.get(pointer).call();
-            pointer = Environment.getPointer();
-            //problem is that the commands which don't jump currently don't tell the environment to move the pointer
-            //need to implement an increment poiinter class.
-            //NOt sure if thisnis best practice lol
-        }
-
-        //problems:
-            // pointer is in environment, but want to iterate through it in interpret function.. fucckkk this is getting messy, need to mao at higher level
-
-        //interpret will
-        // Create a list of comamnds based on strings
-        // Iterate through by starting at pointer zero, calling each command at the pointer, then checkng pointer result
-        return output;
+        return Environment.eval();
     }
     public static class Environment{
         private static Map<String,Integer> registers = new HashMap<>();
         private static Map<String,Integer> labels = new HashMap<>();
-
         private static Stack<Integer> callStack = new Stack<>();
-
-        private List<Command> commands = new ArrayList<>();
+        private static List<Command> commands = new ArrayList<>();
         private static Integer pointer = 0;
-
         private static Integer lastCompare;
+        private static String output = null;
+
+
+        public static String eval(){
+            while(pointer >=0){
+                // testing simple and got to point where pointer == null after trying to call function. It will be something to do with
+                // the map key being incorrect somehow
+                commands.get(pointer).call();
+            }
+            return output;
+        }
+
+        public static void clear(){
+            registers = new HashMap<>();
+            labels = new HashMap<>();
+            callStack = new Stack<>();
+            commands = new ArrayList<>();
+            output = null;
+            pointer = 0;
+        }
+
+        public static void addCommand(Command cmd){commands.add(cmd);}
 
         public static void setRegister(String register, Integer value){
             registers.put(register,value);
@@ -66,6 +71,8 @@ public class AssemblerInterpreter {
             return labels.get(label);
         }
 
+
+        public static void incrementPointer(){pointer++;        }
         public static void setPointer(Integer pnt){
             pointer = pnt;
         }
@@ -129,6 +136,7 @@ public class AssemblerInterpreter {
             Integer i_arg2 = Environment.getRegOrValue(arg2);
             Integer compareVal = i_arg2 == i_arg2 ? 0: (i_arg1 <i_arg2 ? -1:1);
             Environment.setCompare(compareVal);
+            Environment.incrementPointer();
         }
     }
     private static class DivCommand extends Command{
@@ -141,6 +149,8 @@ public class AssemblerInterpreter {
         @Override
         public void call(){
             Integer setValue = Environment.getRegister(arg1)/Environment.getRegOrValue(arg2);
+            Environment.setRegister(arg1,setValue);
+            Environment.incrementPointer();
         }
     }
     private static class MulCommand extends Command{
@@ -152,32 +162,12 @@ public class AssemblerInterpreter {
         }
         @Override
         public void call(){
+
             Integer setValue = Environment.getRegister(arg1)*Environment.getRegOrValue(arg2);
+            Environment.setRegister(arg1,setValue);
+            Environment.incrementPointer();
         }
     }
-//    private static class IncCommand extends Command{
-//        String arg1;
-//        IncCommand(String arg1){
-//            this.arg1  =arg1;
-//        }
-//
-//        @Override
-//        public void call(){
-//            Integer setValue = Environment.getRegister(arg1)+1;
-//            Environment.setRegister(arg1,setValue);
-//        }
-//    }
-//    private static class DecCommand extends Command{
-//        String arg1;
-//        DecCommand(String arg1){
-//            this.arg1  =arg1;
-//        }
-//        @Override
-//        public void call(){
-//            Integer setValue = Environment.getRegister(arg1)-1;
-//            Environment.setRegister(arg1,setValue);
-//        }
-//    }
     private static class SubtractCommand extends Command{
         String arg1;
         String arg2;
@@ -189,6 +179,7 @@ public class AssemblerInterpreter {
         public void call(){
             Integer setValue = Environment.getRegister(arg1) - Environment.getRegOrValue(arg2);
             Environment.setRegister(arg1,setValue);
+            Environment.incrementPointer();
         }
     }
     private static class AddCommand extends Command{
@@ -202,6 +193,7 @@ public class AssemblerInterpreter {
         public void call(){
             Integer setValue = Environment.getRegister(arg1) + Environment.getRegOrValue(arg2);
             Environment.setRegister(arg1,setValue);
+            Environment.incrementPointer();
         }
     }
 
@@ -215,7 +207,9 @@ public class AssemblerInterpreter {
         }
         @Override
         public void call() {
+
             Environment.setRegister(arg1, Environment.getRegOrValue(arg2));
+            Environment.incrementPointer();
         }
     }
     private static class LblCommand extends Command{
@@ -257,14 +251,14 @@ public class AssemblerInterpreter {
         public MsgCommand(String arg1){
             //arg1 is an infnite length string starting with 'msg' and ending with "," delmited elements
             outputElements = new ArrayList<>();
-            String argLessCommand = arg1.substring(4);
+            String argLessCommand = arg1.substring(4).trim();
             for(int i = 0; i<argLessCommand.length();i++){
                 if(argLessCommand.substring(i,i+1).equals("'")){
                     int stringEndIndex = argLessCommand.substring(i+1).indexOf("'") +1; //we started offset by 1
                     outputElements.add(argLessCommand.substring(i,stringEndIndex+1));//save enclosing braces to differntiate regex vs string
                     i = stringEndIndex+1;
                 }
-                else{
+                else if (argLessCommand.substring(i,i+1).matches("[a-zA-Z]")){
                     outputElements.add(argLessCommand.substring(i,i+1));
                     i++;
                 }
@@ -283,6 +277,7 @@ public class AssemblerInterpreter {
                 }
             }
             Environment.setOutput(result.toString());
+            Environment.incrementPointer();
         }
     }
     private static class EndCommand extends Command{
@@ -325,32 +320,49 @@ public class AssemblerInterpreter {
          *
          */
         public static Command createCommand(String commandString, Integer pointer){
+            if(commandString.indexOf(";")!=-1){
+                commandString = commandString.split(";")[0];
+            }
             String commandType = commandString.trim().split(" ")[0];
-            String[] commandWithArgs = commandString.trim().split(" ");
+            String[] commandWithArgs = commandString.trim().split("\\s+");
             Command command;
             switch (commandType){
                 case "mov":
-                    command =  new MovCommand(commandWithArgs[1],commandWithArgs[2]);
+                    command =  new MovCommand(commandWithArgs[1].replaceAll(",",""),commandWithArgs[2]);
+                    break;
                 case  "inc":
                     command = new AddCommand(commandWithArgs[1],"1");
+                    break;
                 case "dec":
                     command = new SubtractCommand(commandWithArgs[1], "1");
+                    break;
                 case  "add":
-                    command = new AddCommand(commandWithArgs[1],commandWithArgs[2]);
+                    command = new AddCommand(commandWithArgs[1].replaceAll(",",""),commandWithArgs[2]);
+                    break;
                 case "sub":
-                    command = new SubtractCommand(commandWithArgs[1],commandWithArgs[2]);
+                    command = new SubtractCommand(commandWithArgs[1].replaceAll(",",""),commandWithArgs[2]);
+                    break;
                 case "mul":
-                    command = new MulCommand(commandWithArgs[1],commandWithArgs[2]);
+                    command = new MulCommand(commandWithArgs[1].replaceAll(",",""),commandWithArgs[2]);
+                    break;
                 case "div":
-                    command = new DivCommand(commandWithArgs[1],commandWithArgs[2]);
+                    command = new DivCommand(commandWithArgs[1].replaceAll(",",""),commandWithArgs[2]);
+                    break;
                 case "cmp":
-                    command = new CmpCommand(commandWithArgs[1],commandWithArgs[2]);
+                    command = new CmpCommand(commandWithArgs[1].replaceAll(",",""),commandWithArgs[2]);
+                    break;
                 case "call":
                     command = new CallCommand(commandWithArgs[1],pointer);
+                    break;
                 case "ret":
                     command = new RetCommand();
+                    break;
                 case "end":
                     command = new EndCommand();
+                    break;
+                case "msg":
+                    command = new MsgCommand(commandString);
+                    break;
                 default:    //label, can be anything except above
                     command = new LblCommand(commandString, pointer);
             }

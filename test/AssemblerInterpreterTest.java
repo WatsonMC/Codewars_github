@@ -16,18 +16,13 @@ public class AssemblerInterpreterTest {
         System.out.println(pgrmOut);
     }
 
+    @Test
+    public void testSimple(){
+        String pgrm = "\n; My first program\nmov  a, 5\ninc  a\ncall function\nmsg  '(5+1)/2 = ', a    ; output message\nend\n\nfunction:\n    div  a, 2\n    ret\n";
+        String pgrmOut = AssemblerInterpreter.interpret(pgrm);
+        System.out.println(pgrmOut);
 
-
-
-
-
-
-
-
-
-
-
-
+    }
 
     @Test
     public void sampleTests() {
