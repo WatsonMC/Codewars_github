@@ -27,7 +27,8 @@ public class AssemblerInterpreterTest {
     @Test
     public void sampleTests() {
         for (int i = 0 ; i < expected.length ; i++) {
-            assertEquals(expected[i], code.AssemblerInterpreter.interpret(displayProg(progs[i])));
+            String output = code.AssemblerInterpreter.interpret(displayProg(progs[i]));
+            assertEquals(expected[i], output);
         }
     }
 

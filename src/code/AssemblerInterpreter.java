@@ -11,8 +11,8 @@ public class AssemblerInterpreter {
         for(String commandString: input.split("\n")){
             if(commandString.length()>0 && commandString.indexOf(";")!=0){
                 Environment.addCommand(CommandFactory.createCommand(commandString,pointer));
+                pointer++;
             }
-            pointer++;
         }
         return Environment.eval();
     }
@@ -106,15 +106,91 @@ public class AssemblerInterpreter {
     //JUMP COMMANDS rest of them
     public static class JmpCommand extends Command{
         String label;
-        String arg1;
-        JmpCommand(String arg1, String label){
-            this.arg1 = arg1;
+        JmpCommand( String label){
             this.label =label;
         }
         @Override
         public void call(){
             Integer jmpPointer = Environment.getLabelPointer(label);
             Environment.setPointer(jmpPointer);
+        }
+    }
+    public static class JgCommand extends Command{
+        String label;
+        JgCommand( String label){
+            this.label =label;
+        }
+        @Override
+        public void call(){
+            Integer jmpPointer = Environment.getLabelPointer(label);
+            if(Environment.getCompare()==1){
+                Environment.setPointer(jmpPointer);
+            }
+        }
+    }
+    public static class JgeCommand extends Command{
+        String label;
+        JgeCommand( String label){
+            this.label =label;
+        }
+        @Override
+        public void call(){
+            Integer jmpPointer = Environment.getLabelPointer(label);
+            if(Environment.getCompare()>=0){
+                Environment.setPointer(jmpPointer);
+            }
+        }
+    }
+    public static class JlCommand extends Command{
+        String label;
+        JlCommand(String label){
+            this.label =label;
+        }
+        @Override
+        public void call(){
+            Integer jmpPointer = Environment.getLabelPointer(label);
+            if(Environment.getCompare()==-1){
+                Environment.setPointer(jmpPointer);
+            }
+        }
+    }
+    public static class JleCommand extends Command{
+        String label;
+        JleCommand(String label){
+            this.label =label;
+        }
+        @Override
+        public void call(){
+            Integer jmpPointer = Environment.getLabelPointer(label);
+            if(Environment.getCompare()<=0){
+                Environment.setPointer(jmpPointer);
+            }
+        }
+    }
+    public static class JeCommand extends Command{
+        String label;
+        JeCommand( String label){
+            this.label =label;
+        }
+        @Override
+        public void call(){
+            Integer jmpPointer = Environment.getLabelPointer(label);
+            if(Environment.getCompare()==0){
+                Environment.setPointer(jmpPointer);
+            }
+        }
+    }
+    public static class JneCommand extends Command{
+        String label;
+        JneCommand( String label){
+            this.label =label;
+        }
+        @Override
+        public void call(){
+            Integer jmpPointer = Environment.getLabelPointer(label);
+            if(Environment.getCompare()!=0){
+                Environment.setPointer(jmpPointer);
+            }
         }
     }
 
@@ -218,12 +294,13 @@ public class AssemblerInterpreter {
         LblCommand(String arg1, Integer pointer){
             this.arg1  =arg1;
             this.pointer = pointer;
-            call();
+            Environment.setLabelPointer(arg1,pointer);
+
         }
 
         @Override
         public void call(){
-            Environment.setLabelPointer(arg1,pointer);
+            Environment.incrementPointer();
         }
     }
     private static class RetCommand extends Command{
@@ -242,25 +319,27 @@ public class AssemblerInterpreter {
 
         @Override
         public void call(){
-            Environment.addToStack(this.pointer);
+            Environment.addToStack(this.pointer+1); //need to return to line after call
+
             Environment.setPointer(Environment.getLabelPointer(arg1));
         }
     }
     public static class MsgCommand extends Command{
         List<String> outputElements;
         public MsgCommand(String arg1){
+            System.out.println(arg1);
             //arg1 is an infnite length string starting with 'msg' and ending with "," delmited elements
             outputElements = new ArrayList<>();
-            String argLessCommand = arg1.substring(4).trim();
+            String argLessCommand = arg1.trim().substring(4).trim();
             for(int i = 0; i<argLessCommand.length();i++){
                 if(argLessCommand.substring(i,i+1).equals("'")){
-                    int stringEndIndex = argLessCommand.substring(i+1).indexOf("'") +1; //we started offset by 1
+                    int stringEndIndex = argLessCommand.substring(i+1).indexOf("'") +i+1; //we started offset by 1
                     outputElements.add(argLessCommand.substring(i,stringEndIndex+1));//save enclosing braces to differntiate regex vs string
                     i = stringEndIndex+1;
                 }
                 else if (argLessCommand.substring(i,i+1).matches("[a-zA-Z]")){
                     outputElements.add(argLessCommand.substring(i,i+1));
-                    i++;
+
                 }
             }
         }
@@ -286,6 +365,8 @@ public class AssemblerInterpreter {
             Environment.setPointer(-1);
         }
     }
+
+
 
     //end command
     //msg command
@@ -363,8 +444,29 @@ public class AssemblerInterpreter {
                 case "msg":
                     command = new MsgCommand(commandString);
                     break;
+                case "jmp":
+                    command = new JmpCommand(commandWithArgs[1]);
+                    break;
+                case "jl":
+                    command = new JlCommand(commandWithArgs[1]);
+                    break;
+                case "jle":
+                    command = new JleCommand(commandWithArgs[1]);
+                    break;
+                case "jg":
+                    command = new JgCommand(commandWithArgs[1]);
+                    break;
+                case "jge":
+                    command = new JgeCommand(commandWithArgs[1]);
+                    break;
+                case "je":
+                    command = new JeCommand(commandWithArgs[1]);
+                    break;
+                case "jne":
+                    command = new JneCommand(commandWithArgs[1]);
+                    break;
                 default:    //label, can be anything except above
-                    command = new LblCommand(commandString, pointer);
+                    command = new LblCommand(commandString.replaceAll(":",""), pointer);
             }
             return command;
         }
