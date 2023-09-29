@@ -30,6 +30,7 @@ public class AssemblerInterpreter {
             while(pointer >=0){
                 // testing simple and got to point where pointer == null after trying to call function. It will be something to do with
                 // the map key being incorrect somehow
+                if(pointer>=commands.size()){return null;}
                 commands.get(pointer).call();
             }
             return output;
@@ -126,6 +127,9 @@ public class AssemblerInterpreter {
             if(Environment.getCompare()==1){
                 Environment.setPointer(jmpPointer);
             }
+            else{
+                Environment.incrementPointer();
+            }
         }
     }
     public static class JgeCommand extends Command{
@@ -152,6 +156,9 @@ public class AssemblerInterpreter {
             if(Environment.getCompare()==-1){
                 Environment.setPointer(jmpPointer);
             }
+            else{
+                Environment.incrementPointer();
+            }
         }
     }
     public static class JleCommand extends Command{
@@ -164,6 +171,9 @@ public class AssemblerInterpreter {
             Integer jmpPointer = Environment.getLabelPointer(label);
             if(Environment.getCompare()<=0){
                 Environment.setPointer(jmpPointer);
+            }
+            else{
+                Environment.incrementPointer();
             }
         }
     }
@@ -178,6 +188,9 @@ public class AssemblerInterpreter {
             if(Environment.getCompare()==0){
                 Environment.setPointer(jmpPointer);
             }
+            else{
+                Environment.incrementPointer();
+            }
         }
     }
     public static class JneCommand extends Command{
@@ -190,6 +203,9 @@ public class AssemblerInterpreter {
             Integer jmpPointer = Environment.getLabelPointer(label);
             if(Environment.getCompare()!=0){
                 Environment.setPointer(jmpPointer);
+            }
+            else{
+                Environment.incrementPointer();
             }
         }
     }
@@ -210,7 +226,7 @@ public class AssemblerInterpreter {
             //arg1 == arg2 = 0
             Integer i_arg1 = Environment.getRegOrValue(arg1);
             Integer i_arg2 = Environment.getRegOrValue(arg2);
-            Integer compareVal = i_arg2 == i_arg2 ? 0: (i_arg1 <i_arg2 ? -1:1);
+            Integer compareVal = i_arg1 == i_arg2 ? 0: (i_arg1 <i_arg2 ? -1:1);
             Environment.setCompare(compareVal);
             Environment.incrementPointer();
         }
