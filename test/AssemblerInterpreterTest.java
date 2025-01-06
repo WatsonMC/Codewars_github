@@ -17,6 +17,31 @@ public class AssemblerInterpreterTest {
     }
 
     @Test
+    public void loopingTest (){
+        String pgrm = "mov c, 14   ; instruction mov c, 14\n" +
+                "mov d, 112   ; instruction mov d, 112\n" +
+                "call func\n" +
+                "msg 'Random result: ', g\n" +
+                "end\n" +
+                "\n" +
+                "func:\n" +
+                "  cmp c, d\n" +
+                "  jge exit\n" +
+                "  mov g, c\n" +
+                "  mul g, d\n" +
+                "  ret\n" +
+                "; Do nothing\n" +
+                "exit:\n" +
+                "  msg 'Do nothing'\n" +
+                "\n" +
+                "msg 'Random result: ', g\n" +
+                "  msg 'Do nothing'";
+        String pgrmOut = AssemblerInterpreter.interpret(pgrm);
+        System.out.println(pgrmOut);
+
+    }
+
+    @Test
     public void testSimple(){
         String pgrm = "\n; My first program\nmov  a, 5\ninc  a\ncall function\nmsg  '(5+1)/2 = ', a    ; output message\nend\n\nfunction:\n    div  a, 2\n    ret\n";
         String pgrmOut = AssemblerInterpreter.interpret(pgrm);

@@ -5,7 +5,6 @@ import java.util.*;
 public class AssemblerInterpreter {
     //Extended from CalculusBear's solution to 'Simple Assembler Interpeter'
     public static String interpret(final String input) {
-        // Your code here!
         Environment.clear();
         int pointer = 0;
         for(String commandString: input.split("\n")){
@@ -28,8 +27,6 @@ public class AssemblerInterpreter {
 
         public static String eval(){
             while(pointer >=0){
-                // testing simple and got to point where pointer == null after trying to call function. It will be something to do with
-                // the map key being incorrect somehow
                 if(pointer>=commands.size()){return null;}
                 commands.get(pointer).call();
             }
@@ -64,149 +61,90 @@ public class AssemblerInterpreter {
             }
             return setValue;
         }
-
-        public static void setLabelPointer(String label, Integer pointer){
-            labels.put(label,pointer);
-        }
-        public static Integer getLabelPointer(String label){
-            return labels.get(label);
-        }
-
-
+        public static void setLabelPointer(String label, Integer pointer){labels.put(label,pointer); }
+        public static Integer getLabelPointer(String label){return labels.get(label); }
         public static void incrementPointer(){pointer++;        }
-        public static void setPointer(Integer pnt){
-            pointer = pnt;
-        }
-        public static Integer getPointer(){
-            return pointer;
-        }
-        public static void setCompare(Integer val){
-            lastCompare = val;
-        }
-        public static Integer getCompare(){
-            return lastCompare;
-        }
-
-        public static void addToStack(Integer pointer){
-            callStack.add(pointer);
-        }
-
-        public static Integer removeFromStack(){
-            return callStack.pop();
-        }
-
-        public static void setOutput(String arg){
-            output = arg; //this is dodgey as we are using enviroment to set athe static interpreter classes output
-        }
-
+        public static void setPointer(Integer pnt){ pointer = pnt; }
+        public static void setCompare(Integer val){lastCompare = val; }
+        public static Integer getCompare(){ return lastCompare;  }
+        public static void addToStack(Integer pointer){ callStack.add(pointer); }
+        public static Integer removeFromStack(){ return callStack.pop();  }
+        public static void setOutput(String arg){ output = arg;   }
     }
-
     private static abstract class Command{
         public abstract void call();
     }
-    //JUMP COMMANDS rest of them
+
+    //JUMP COMMANDS
     public static class JmpCommand extends Command{
         String label;
+        Boolean jump = true;
         JmpCommand( String label){
             this.label =label;
         }
         @Override
-        public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            Environment.setPointer(jmpPointer);
+        public void call(){jump();}
+        public void jump(){
+            if(jump){Environment.setPointer(Environment.getLabelPointer(label));}
+            else{Environment.incrementPointer();}
         }
     }
-    public static class JgCommand extends Command{
-        String label;
-        JgCommand( String label){
-            this.label =label;
-        }
+    public static class JgCommand extends JmpCommand {
+        JgCommand(String label){super(label);}
         @Override
         public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            if(Environment.getCompare()==1){
-                Environment.setPointer(jmpPointer);
-            }
-            else{
-                Environment.incrementPointer();
-            }
+            jump = Environment.getCompare()==1;
+            jump();
         }
     }
-    public static class JgeCommand extends Command{
-        String label;
+    public static class JgeCommand extends JmpCommand{
         JgeCommand( String label){
-            this.label =label;
+            super(label);
         }
         @Override
         public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            if(Environment.getCompare()>=0){
-                Environment.setPointer(jmpPointer);
-            }
+            jump = Environment.getCompare()>=0;
+            jump();
         }
     }
-    public static class JlCommand extends Command{
-        String label;
+    public static class JlCommand extends JmpCommand{
         JlCommand(String label){
-            this.label =label;
+            super(label);
         }
         @Override
         public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            if(Environment.getCompare()==-1){
-                Environment.setPointer(jmpPointer);
-            }
-            else{
-                Environment.incrementPointer();
-            }
+            jump = Environment.getCompare()<0;
+            jump();
         }
     }
-    public static class JleCommand extends Command{
-        String label;
+    public static class JleCommand extends JmpCommand{
         JleCommand(String label){
-            this.label =label;
+            super(label);
         }
         @Override
         public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            if(Environment.getCompare()<=0){
-                Environment.setPointer(jmpPointer);
-            }
-            else{
-                Environment.incrementPointer();
-            }
+            jump = Environment.getCompare()<=0;
+            jump();
         }
     }
-    public static class JeCommand extends Command{
-        String label;
+    public static class JeCommand extends JmpCommand{
         JeCommand( String label){
-            this.label =label;
+            super(label);
         }
         @Override
         public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            if(Environment.getCompare()==0){
-                Environment.setPointer(jmpPointer);
-            }
-            else{
-                Environment.incrementPointer();
-            }
+            jump = Environment.getCompare()==0;
+            jump();
         }
     }
-    public static class JneCommand extends Command{
-        String label;
+    public static class JneCommand extends JmpCommand{
         JneCommand( String label){
-            this.label =label;
+            super(label);
         }
         @Override
         public void call(){
-            Integer jmpPointer = Environment.getLabelPointer(label);
-            if(Environment.getCompare()!=0){
-                Environment.setPointer(jmpPointer);
-            }
-            else{
-                Environment.incrementPointer();
-            }
+            jump = Environment.getCompare()!=0;
+            jump();
         }
     }
 
@@ -221,9 +159,6 @@ public class AssemblerInterpreter {
 
         @Override
         public void call(){
-            //arg1> arg2 = 1
-            //arg1<arg2 = -1
-            //arg1 == arg2 = 0
             Integer i_arg1 = Environment.getRegOrValue(arg1);
             Integer i_arg2 = Environment.getRegOrValue(arg2);
             Integer compareVal = i_arg1 == i_arg2 ? 0: (i_arg1 <i_arg2 ? -1:1);
@@ -254,7 +189,6 @@ public class AssemblerInterpreter {
         }
         @Override
         public void call(){
-
             Integer setValue = Environment.getRegister(arg1)*Environment.getRegOrValue(arg2);
             Environment.setRegister(arg1,setValue);
             Environment.incrementPointer();
@@ -299,7 +233,6 @@ public class AssemblerInterpreter {
         }
         @Override
         public void call() {
-
             Environment.setRegister(arg1, Environment.getRegOrValue(arg2));
             Environment.incrementPointer();
         }
@@ -311,9 +244,7 @@ public class AssemblerInterpreter {
             this.arg1  =arg1;
             this.pointer = pointer;
             Environment.setLabelPointer(arg1,pointer);
-
         }
-
         @Override
         public void call(){
             Environment.incrementPointer();
@@ -335,27 +266,38 @@ public class AssemblerInterpreter {
 
         @Override
         public void call(){
-            Environment.addToStack(this.pointer+1); //need to return to line after call
-
+            Environment.addToStack(this.pointer+1);
             Environment.setPointer(Environment.getLabelPointer(arg1));
         }
     }
     public static class MsgCommand extends Command{
-        List<String> outputElements;
+        List<String> outputElements = new ArrayList<>();
         public MsgCommand(String arg1){
-            System.out.println(arg1);
-            //arg1 is an infnite length string starting with 'msg' and ending with "," delmited elements
-            outputElements = new ArrayList<>();
+            StringBuilder sb = new StringBuilder();
+            boolean inString = false;
             String argLessCommand = arg1.trim().substring(4).trim();
-            for(int i = 0; i<argLessCommand.length();i++){
-                if(argLessCommand.substring(i,i+1).equals("'")){
-                    int stringEndIndex = argLessCommand.substring(i+1).indexOf("'") +i+1; //we started offset by 1
-                    outputElements.add(argLessCommand.substring(i,stringEndIndex+1));//save enclosing braces to differntiate regex vs string
-                    i = stringEndIndex+1;
-                }
-                else if (argLessCommand.substring(i,i+1).matches("[a-zA-Z]")){
-                    outputElements.add(argLessCommand.substring(i,i+1));
 
+            for(int i = 0; i<argLessCommand.length();i++) {
+                String nextChar = argLessCommand.substring(i,i+1);
+                if(inString){
+                    if(nextChar.equals("'")){
+                        inString = false;
+                        sb.append("'");
+                        outputElements.add(sb.toString());
+                        sb = new StringBuilder();
+                    }
+                    else{
+                        sb.append(argLessCommand, i, i+1);
+                    }
+                }
+                else{
+                    if(nextChar.equals("'")){
+                        inString = true;
+                        sb.append("'");
+                    }
+                    else if (nextChar.matches("[a-zA-Z]")){
+                        outputElements.add(nextChar);
+                    }
                 }
             }
         }
@@ -365,10 +307,10 @@ public class AssemblerInterpreter {
             StringBuilder result = new StringBuilder();
             for(String element: outputElements){
                 if(element.length() == 1){
-                    result.append(String.valueOf(Environment.getRegOrValue(element)));
+                    result.append(Environment.getRegOrValue(element));
                 }
                 else{
-                    result.append(element.substring(1,element.length()-1));
+                    result.append(element, 1, element.length()-1);
                 }
             }
             Environment.setOutput(result.toString());
@@ -382,40 +324,7 @@ public class AssemblerInterpreter {
         }
     }
 
-
-
-    //end command
-    //msg command
     private static class CommandFactory{
-        /**
-         * Command types
-         * 2 input
-         * - mov done
-         * - add done
-         * - sub done
-         * - div done
-         * - mul done
-         * - cmp done
-         *
-         * 1 input
-         * - jmps
-         * - call Done
-         * - dec done
-         * - inc done
-         *
-         * Pointer input
-         * - label done
-         *
-         * Infinite input
-         * - msg
-         *
-         * no inputs
-         * ret done
-         * end
-         * comment
-         *
-         *
-         */
         public static Command createCommand(String commandString, Integer pointer){
             if(commandString.indexOf(";")!=-1){
                 commandString = commandString.split(";")[0];
@@ -487,6 +396,4 @@ public class AssemblerInterpreter {
             return command;
         }
     }
-
-
 }
