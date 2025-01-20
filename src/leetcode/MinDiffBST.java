@@ -8,9 +8,11 @@ public class MinDiffBST {
 
     /**
      * This solution does not make use of two properties of a BST that I somehow have never realised before:
-     *  1. The left lode of a tree is always less than the root node
-     *  2. the right node of the dtree is always greater than the root node
+     * 1. THe left SUBTREE of a tree contains only values less than the root value
+     * 2. the right SUBTREE of a tree contains only values greater than the root value
      *  This is fundamentally why BST is so useful, and I have been compeltely oblivious to it.
+     *
+     *  Hence in order traversal is in-order of ascneding values. der.
      */
 
     public int getMinimumDifference(TreeNode root){
